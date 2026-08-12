@@ -1,0 +1,53 @@
+paths:
+  input_alignments_filtered: null
+  input_alignments_finished: null
+  input_alignments_raw: null
+  input_database: null
+  input_genes: null
+  input_genomes: null
+  input_trees: null
+  output_root: null
+  workdir_root: null
+sbatch_base:
+  error: null
+  mail-user: null
+  output: null
+  partition: null
+sbatch_section_1:
+  1-1_process_genomes:
+    cpus-per-task: 10
+    mail-type: FAIL
+    mem: 80G
+    time: 0-40:00
+  1-3_align_loci:
+    cpus-per-task: 6
+    mail-type: FAIL
+    mem: 60G
+    time: 0-16:00
+  1_make_alignments:
+    cpus-per-task: 8
+    mail-type: BEGIN, END, FAIL
+    mem: 60G
+    time: 0-64:00
+sbatch_section_2:
+  2-1_rate_alignments:
+    cpus-per-task: 10
+    mail-type: FAIL
+    mem: 80G
+    time: 0-20:00
+  2_process_alignments:
+    cpus-per-task: 8
+    mail-type: BEGIN, END, FAIL
+    mem: 60G
+    time: 0-24:00
+sbatch_section_3:
+  3-1_make_gene_tree:
+    cpus-per-task: 8
+    mail-type: FAIL
+    mem: 60G
+    time: 0-16:00
+  3_make_trees:
+    cpus-per-task: 8
+    mail-type: BEGIN, END, FAIL
+    mem: 60G
+    time: 0-24:00

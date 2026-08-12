@@ -1,0 +1,60 @@
+# absolute paths to relevant files and directories
+paths:
+  workdir_root: /dss/work/rego3475/GenoTree/
+  output_root: /dss/data/rego3475/GenoTree/
+  input_database: /fs/s6k/groups/aganimalbiodiv/ronjaroesner/genotree_master_library.db
+  input_genomes: /fs/s6k/groups/aganimalbiodiv/simonkaefer/genomes/unzippedGenomes/
+  input_genes: /fs/s6k/groups/aganimalbiodiv/ronjaroesner/locus-fa_1105_nucleotide/
+  input_alignments_raw: /user/rego3475/master_input/all_hits_aligned_original/
+  input_alignments_filtered: /user/rego3475/master_input/all_hits_aligned_filtered/
+  input_alignments_finished: /user/rego3475/master_input/all_hits_aligned_renamed/
+  input_trees: /user/rego3475/master_input/phylo_trees/threshold-0_35-realigned/
+
+# SBATCH settings, global
+sbatch_base:
+  partition: "rosa.p"
+  mail-user: "ronja.roesner@uol.de"
+  output: "~/master_output/logs/%j.out"
+  error: "~/master_output/logs/%j.err"
+
+# SBATCH settings, per section and file
+sbatch_section_1:
+  1_make_alignments:
+    cpus-per-task: "8"
+    mem: "60G"
+    time: "0-64:00"
+    mail-type: "BEGIN, END, FAIL"
+  1-1_process_genomes:
+    cpus-per-task: "10"
+    mem: "80G"
+    time: "0-40:00"
+    mail-type: "FAIL"
+  1-3_align_loci:
+    cpus-per-task: "6"
+    mem: "60G"
+    time: "0-16:00"
+    mail-type: "FAIL"
+
+sbatch_section_2:
+  2_process_alignments:
+    cpus-per-task: "8"
+    mem: "60G"
+    time: "0-24:00"
+    mail-type: "BEGIN, END, FAIL"
+  2-1_rate_alignments:
+    cpus-per-task: "10"
+    mem: "80G"
+    time: "0-20:00"
+    mail-type: "FAIL"
+
+sbatch_section_3:
+  3_make_trees:
+    cpus-per-task: "8"
+    mem: "60G"
+    time: "0-24:00"
+    mail-type: "BEGIN, END, FAIL"
+  3-1_make_gene_tree:
+    cpus-per-task: "8"
+    mem: "60G"
+    time: "0-16:00"
+    mail-type: "FAIL"

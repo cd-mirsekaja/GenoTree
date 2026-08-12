@@ -1,0 +1,50 @@
+Screen {
+	layers: sidebar;
+}
+
+Sidebar#options-sidebar {
+	width: 30;
+	/* Needs to go in its own layer to sit above content */
+	layer: sidebar; 
+	/* Dock the sidebar to the appropriate side */
+	dock: right;
+	/* Offset x to be 100% to move it out of view by default */
+	offset-x: 100%;
+
+	background: $surface;
+	border-right: vkey $background;    
+
+	/* Enable animation */
+	transition: offset 200ms;
+	
+	&.-visible {
+		/* Set offset.x to 0 to make it visible when class is applied */
+		offset-x: 0;
+	}
+
+	& > Vertical {
+		margin: 1 2;
+	}
+}
+
+Input#species-search {
+	dock: top;
+	margin: 1 0;
+}
+
+#results {
+	width: 100%;
+	height: auto;
+}
+
+#results-container {
+	background: $surface;
+	margin: 0 0 0 0;
+	height: 98%;
+	overflow: hidden auto;
+	border: tall transparent;
+}
+
+#results-container:focus {
+	border: tall $border;
+}

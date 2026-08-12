@@ -1,0 +1,54 @@
+{
+    "WoRMS": {
+        "id": {
+            "url_base": "https://www.marinespecies.org/rest/AphiaIDByName/",
+            "url_param": self.scientific_name_mod,
+            "url_append": "?marine_only=false&extant_only=false"
+        },
+        "main": {
+            "url_base": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/",
+            "url_param": self.aphia_id,
+            "url_append": ""
+        },
+        "vernacular": {
+            "url_base": "https://www.marinespecies.org/rest/AphiaVernacularsByAphiaID/",
+            "url_param": self.aphia_id,
+            "url_append": ""
+        }
+    },
+    "GBIF": {
+        "id": {
+            "url_base": "https://api.gbif.org/v1/species?name=",
+            "url_param": self.scientific_name_mod,
+            "url_append": "&offset=0&limit=1",
+            "nested_keys": ['results', 0, 'key']
+        },
+        "main": {
+            "url_base": "https://api.gbif.org/v1/species/",
+            "url_param": self.usagekey,
+            "url_append": ""
+        },
+        "vernacular": {
+            "url_base": "https://api.gbif.org/v1/species/",
+            "url_param": self.usagekey,
+            "url_append": "/vernacularNames"
+        }
+    },
+    "IRMNG": {
+        "id": {
+            "url_base": "https://www.irmng.org/rest/IRMNG_IDByName/",
+            "url_param": self.scientific_name_mod,
+            "url_append": ""
+        },
+        "main": {
+            "url_base": "https://www.irmng.org/rest/AphiaRecordByIRMNG_ID/",
+            "url_param": self.irmng_id,
+            "url_append": ""
+        },
+        "vernacular": {
+            "url_base": "https://www.irmng.org/rest/AphiaVernacularsByIRMNG_ID/",
+            "url_param": self.irmng_id,
+            "url_append": ""
+        }
+    }
+}

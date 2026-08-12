@@ -1,0 +1,7 @@
+HelpScreen {
+    align: center middle;
+}
+
+QuitScreen {
+    align: center middle;
+}

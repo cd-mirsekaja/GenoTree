@@ -1,0 +1,49 @@
+#app-grid {
+    layout: grid;
+    grid-size: 3;  /* three columns */
+    grid-columns: 1fr 2fr 1fr;
+    grid-rows: 1fr;
+}
+
+#left-pane {
+    width: 99%;
+    height: 98%;
+    border: darkolivegreen;
+}
+
+#middle-pane {
+    width: 99%;
+    height: 98%;
+    border: darkolivegreen;
+}
+
+#right-pane {
+    width: 99%;
+    height: 98%;
+    border: darkolivegreen;
+}
+
+#input-grid-single {
+    layout: grid;
+    grid-size: 2;
+    grid-columns: 1fr 1fr;
+    grid-rows: 1fr;
+}
+
+#input-grid-batch {
+    layout: grid;
+    grid-size: 1;
+    grid-columns: 1fr;
+    grid-rows: 1fr;
+}
+
+ProgressBar {
+    dock: top;
+}
+TextArea {
+    height: 95%;
+}
+
+Checkbox {
+    width: 95%;
+}
