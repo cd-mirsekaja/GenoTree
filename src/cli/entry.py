@@ -66,7 +66,7 @@ parser_db.add_argument(
 	action = "store",
 	choices = ["update", "add", "remove"],
 	help = "operation to perform on the database",
-	required = True
+	required = False
 )
 parser_db.set_defaults(func = cli_db)
 

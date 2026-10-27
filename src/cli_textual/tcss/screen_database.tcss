@@ -9,6 +9,10 @@
     width: 99%;
     height: 98%;
     border: darkolivegreen;
+    align: center top;
+}
+
+#left-pane-input {
 }
 
 #middle-pane {
@@ -23,18 +27,11 @@
     border: darkolivegreen;
 }
 
-#input-grid-single {
-    layout: grid;
-    grid-size: 2;
-    grid-columns: 1fr 1fr;
-    grid-rows: 1fr;
-}
-
-#input-grid-batch {
-    layout: grid;
-    grid-size: 1;
-    grid-columns: 1fr;
-    grid-rows: 1fr;
+#main-pane {
+    width: 99%;
+    height: 98%;
+    border: darkolivegreen;
+    align: center top;
 }
 
 ProgressBar {
@@ -46,4 +43,9 @@ TextArea {
 
 Checkbox {
     width: 95%;
+}
+
+DirectoryTree {
+    height: 30%;
+    content-align: left top;
 }
