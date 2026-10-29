@@ -1,47 +1,18 @@
+"""
+Contains various utility functions for interacting with the Downloader, Merger and Database interface.
+"""
+
 import httpx
-import asyncio
 from datetime import datetime
 from typing import Literal
 
-from src.db.db_merger import Merger
-
-
-async def verifySpeciesNameVerbose(scientific_name: str) -> dict:
-	scientific_name_mod = '%20'.join(scientific_name.split())
-
-	base_url = "https://verifier.globalnames.org/api/v1/search/"
-	verifier_url = f"{base_url}n%3A{scientific_name_mod}"
-
-	async with httpx.AsyncClient() as client:
-		response = await client.get(verifier_url)
-		try:
-			result = response.json()
-		except Exception:
-			result = {"error": f"Failed to parse JSON from {verifier_url}"}
-
-	# save relevant httpx results
-	if "names" in result.keys():
-		best_result = result["names"][0]["bestResult"]
-		out_dict = {
-			"matchType": best_result["matchType"],
-			"curation": best_result["curation"],
-			"SearchedName": scientific_name,
-			"MatchedName": best_result["currentCanonicalSimple"]
-		}
-	# if no result, just return input name
-	elif not "names" in result.keys():
-		out_dict = {
-			"matchType": None,
-			"curation": None,
-			"SearchedName": scientific_name,
-			"MatchedName": None
-		}
-
-	# return full dictionary
-	return out_dict
-
+from src.db.db_merger import DBMerger
 
 async def verifySpeciesName(scientific_name: str) -> str:
+	"""
+	Verify the input scientific name using the Global Names Architecture Scientific Names Services. (https://globalnames.org).
+	"""
+
 	scientific_name_mod = '%20'.join(scientific_name.split())
 
 	base_url = "https://verifier.globalnames.org/api/v1/search/"
@@ -68,6 +39,15 @@ async def verifySpeciesName(scientific_name: str) -> str:
 
 
 async def getInfo(scientific_name: str, platform: Literal['Automatic', 'WoRMS', 'GBIF', 'IRMNG'] = 'Automatic', verify: bool = False) -> dict:
+	"""
+	Fetch and merge data for the specified species name.
+	Variables:
+		- scientific_name (str): A scientific name, either at species level (most reliable) or any other taxonomic level.
+		- platform (list | str): A platform to fetch data from, can be either of 'Automatic', 'WoRMS', 'GBIF' or 'IRMNG'. Defaults to 'Automatic'.
+		- verify (bool): Whether to use the GNA name verifier on the input name before fetching the data. Defaults to 'False'.
+	Returns:
+		- dict: A dictionary of the downloaded data from any of the specified platforms.
+	"""
 	if platform == "Automatic":
 		platforms = ["WoRMS", "GBIF", "IRMNG"]
 	else:
@@ -76,9 +56,9 @@ async def getInfo(scientific_name: str, platform: Literal['Automatic', 'WoRMS', 
 	# use species verification if requested
 	if verify:
 		verified_name = await verifySpeciesName(scientific_name)
-		merger = Merger(verified_name, platforms)
+		merger = DBMerger(verified_name, platforms)
 	else:
-		merger = Merger(scientific_name, platforms)
+		merger = DBMerger(scientific_name, platforms)
 
 	# create an index from the input name. If no whitespace is in the name, only take the first three letters
 	try:
@@ -95,23 +75,4 @@ async def getInfo(scientific_name: str, platform: Literal['Automatic', 'WoRMS', 
 	out_dict.update(await merger.export())
 
 	return out_dict
-
-
-
-
-
-if __name__ == "__main__":
-	import json
-
-	sciname = "Ballerus ballerus"
-	info = asyncio.run(getInfo(sciname, "Automatic", True))
-
-	#sciname = input("Enter a scientific name: ")
-
-	#verification = asyncio.run(verifySpeciesName(sciname, verbose = True))
-	#print("Verification result:")
-	#print(json.dumps(verification, indent = 2))
-
-	print("Search result:")
-	print(json.dumps(info, indent = 2))
 
