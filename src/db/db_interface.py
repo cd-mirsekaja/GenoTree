@@ -5,7 +5,7 @@ import asyncio
 import sys, os
 import pandas as pd
 import sqlite3
-from typing import Callable, Literal
+from typing import Callable
 
 from db.db_input_parser import DBInputParser
 
@@ -28,6 +28,43 @@ class DBInterface():
 		self.log = log
 
 		self._initializeDB(db_overwrite)
+
+	def readData(self):
+		pass
+
+	def insertData(self, table_name: str, df: pd.DataFrame) -> None:
+		"""
+		Insert new data into the database. Either replace or append to existing data, or fail if the table already exists.
+		Args:
+			table_name (str): Name of the table to insert data into.
+			df (pandas.DataFrame): DataFrame with the new data. Must contain a column with the primary key defined in the database schema.
+		"""
+
+		if table_name not in DATABASE_SCHEMA:
+			self.log(f"Error: Table '{table_name}' is not defined in the database schema.")
+			return
+
+		self._connect()
+
+		# turn all columns into strings to avoid type issues
+		df = df.map(str)
+		df.to_sql(table_name, self.conn, if_exists='append', index=False)
+		self.conn.commit()
+
+		self._disconnect()
+
+	def removeData(self):
+		pass
+
+	def readRow(self):
+		pass
+
+	def insertRow(self, primary_id, data):
+		pass
+
+	def removeRow(self, primary_id):
+		pass
+
 
 	def _connect(self) -> None:
 		"""
@@ -79,38 +116,18 @@ class DBInterface():
 		self._disconnect()
 
 
-	def insertData(self, table_name: str, df: pd.DataFrame) -> None:
-		"""
-		Insert new data into the database. Either replace or append to existing data, or fail if the table already exists.
-		Args:
-			table_name (str): Name of the table to insert data into.
-			df (pandas.DataFrame): DataFrame with the new data. Must contain a column with the primary key defined in the database schema.
-		"""
-		
-		if table_name not in DATABASE_SCHEMA:
-			self.log(f"Error: Table '{table_name}' is not defined in the database schema.")
-			return
-		
-		self._connect()
-		
-		# turn all columns into strings to avoid type issues
-		df = df.map(str)
-		df.to_sql(table_name, self.conn, if_exists = 'append', index = False)
-		self.conn.commit()
 
-		self._disconnect()
-
-
-def updateDB(db_path: str, 
-			 input_data: list, input_type: Literal['csv', 'single'],
-			 overwrite_file: bool = False, 
-			 verify_names: bool = True, 
+def updateDB(db_path: str,
+			 input_data: list,
+			 overwrite_file: bool = False,
+			 verify_names: bool = True,
 			 log: Callable = print) -> None:
 	input_parser = DBInputParser(log = log)
 
 	data = asyncio.run(input_parser.fetchData(input_data, verify_names))
+
 	db = DBInterface(db_path, overwrite_file, log)
-	
+
 	data_keys = data.columns
 
 	for table_name in DATABASE_SCHEMA.keys():
@@ -118,9 +135,9 @@ def updateDB(db_path: str,
 		# match keys in fetched data to database schema so only columns with data are inserted into the database
 		matched_keys = [db_key for db_key in db_keys if any(data_key in db_key for data_key in data_keys)]
 		db_data = data[matched_keys]
-	
+
 		db.insertData(table_name, db_data)
-	
+
 	log(f"Database at '{db_path}' updated successfully. Inserted {len(data)} entries.")
 
 
@@ -130,8 +147,8 @@ def main():
 
 	test_db = f"{ROOT_DIR}/test/test.db"
 	
-	updateDB(test_db, test_list, 'single', True, True)
-	updateDB(test_db, test_file, 'csv', False, True)
+	updateDB(test_db, test_list, True, True)
+	updateDB(test_db, test_file, False, True)
 
 
 if __name__ == "__main__":
