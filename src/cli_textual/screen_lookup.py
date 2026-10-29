@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from textual import getters, work
 from textual.app import App, ComposeResult
-from textual.containers import VerticalScroll, Vertical
+from textual.containers import VerticalScroll
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widget import Widget
 from textual.widgets import Input, Markdown, Footer, Header, RadioSet, RadioButton, Checkbox
 
-from src.utils.db_downloader import getInfo
+from src.db.db_utils import getInfo
+
 
 class Sidebar(Widget):
 	def compose(self) -> ComposeResult:

@@ -1,27 +1,20 @@
-
-import sys, os
-
 import pandas
-from rich.rule import Rule
 
-from pathlib import Path, PosixPath
+from pathlib import Path
 from typing import Iterable
 
-from textual._types import UnusedParameter
 from textual.app import App, ComposeResult
 from textual.screen import Screen
 from textual.containers import Container, Vertical, VerticalScroll, Horizontal
 from textual.widget import Widget
-from textual.widgets import Footer, Header, Markdown, Button, Log, RichLog, Rule, Input, TextArea, Tabs, TabbedContent, \
-	ContentSwitcher, RadioSet, RadioButton, Checkbox, ProgressBar, DataTable, Label, DirectoryTree, TabPane
-from textual.validation import Function, Number, ValidationResult, Validator
+from textual.widgets import Footer, Header, Markdown, Button, RichLog, Input, TextArea, TabbedContent, \
+	Checkbox, ProgressBar, DataTable, Label, DirectoryTree, TabPane
+from textual.validation import ValidationResult, Validator
 
 from textual.reactive import reactive
 
-from src.utils.db_interface import updateDB
-
-from src.utils.db_importer import parseData, fetchData
-from src.utils.db_downloader import ROOT_DIR
+from src.db.db_input_parser import DBInputParser
+from src.const import ROOT_DIR
 
 class DirValidator(Validator):
 	"""Test if input is an existing directory."""
@@ -103,6 +96,8 @@ class SearchLeftPane(Widget):
 			self.update_dirtree(event.value)
 
 	async def on_button_pressed(self, event: Button.Pressed) -> None:
+		input_parser = DBInputParser(log = self.screen.query_one(SearchRightPane).update_log)
+
 		if event.button.id == "button-upload":
 			file_path = self.path_selected
 			with open(file = file_path, mode = "r") as file:
@@ -116,8 +111,7 @@ class SearchLeftPane(Widget):
 			input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
 			self.screen.query_one(SearchRightPane).reset_progress()
 
-			parsed_input = await parseData(input_text, "textarea",
-										   self.screen.query_one(SearchRightPane).update_log)
+			parsed_input = await input_parser.parseInput(input_text, "textarea")
 
 			if parsed_input:
 				self.screen.query_one(SearchRightPane).update_log("Parsed from Input:")
@@ -127,7 +121,7 @@ class SearchLeftPane(Widget):
 		elif event.button.id == "button-submit":
 			input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
 
-			parsed_input = await parseData(input_text, "textarea", self.screen.query_one(SearchRightPane).update_log)
+			parsed_input = await input_parser.parseInput(input_text, "textarea")
 
 			if parsed_input:
 				input_len = len(parsed_input)
@@ -136,8 +130,7 @@ class SearchLeftPane(Widget):
 				self.screen.query_one(SearchRightPane).update_steps(input_len)
 
 				self.screen.query_one(SearchRightPane).update_log(f"Fetching data for {input_len} entries...")
-				fetched_data = await fetchData(parsed_input, False,
-											   self.screen.query_one(SearchRightPane).update_log)
+				fetched_data = await input_parser.fetchData(parsed_input, False)
 
 				self.screen.query_one(SearchMiddlePane).update_table(fetched_data)
 				self.screen.query_one(SearchRightPane).update_log("Fetched data added to overview table.")

@@ -1,50 +1,16 @@
 """
 
 """
-
+import asyncio
 import sys, os
 import pandas as pd
-import sqlite3, csv
+import sqlite3
 from typing import Callable, Literal
 
-from src.utils.db_downloader import ROOT_DIR
-from src.utils.db_importer import fetchData
+from db.db_input_parser import DBInputParser
 
-DATABASE_SCHEMA = {
-	"taxonomy": {
-		"IDX": 'text primary key',
-		"tKingdom": 'text',
-		"tPhylum": 'text',
-		"tClass": 'text',
-		"tOrder": 'text',
-		"tFamily": 'text',
-		"tGenus": 'text',
-		"tSpecies": 'text',
-		"tSubspecies": 'text',
-		"ScientificName": 'text',
-		"Authority": 'text',
-		"Vernacular_ENG": 'text',
-		"Vernacular_GER": 'text'
-	},
-	"identifiers": {
-		"IDX": 'text primary key',
-		"AccessionNumber": 'text',
-		"usageKey": 'text',
-		"IRMNG_ID": 'text',
-		"AphiaID": 'text',
-		"PESI_GUID": 'text'
-	},
-	"traits": {
-		"IDX": 'text primary key',
-		"isMarine": 'blob',
-		"isBrackish": 'blob',
-		"isFreshwater": 'blob',
-		"isTerrestrial": 'blob',
-		"isAllWater": 'blob',
-		"isIntertidal": 'blob',
-		"isExtinct": 'blob'
-	}
-}
+from src.const import DATABASE_SCHEMA, ROOT_DIR
+
 
 class DBInterface():
 	"""
@@ -55,6 +21,7 @@ class DBInterface():
 	"""
 	
 	def __init__(self, db_path: str, db_overwrite: bool, log: Callable = print) -> None:
+
 		self.db_path = db_path
 		self.conn = None
 		self.cursor = None
@@ -135,12 +102,13 @@ class DBInterface():
 
 
 def updateDB(db_path: str, 
-			 input_data: list | str, input_type: Literal['csv', 'single'], 
+			 input_data: list, input_type: Literal['csv', 'single'],
 			 overwrite_file: bool = False, 
 			 verify_names: bool = True, 
 			 log: Callable = print) -> None:
-	
-	data = fetchData(input_data, input_type, verify_names, log)
+	input_parser = DBInputParser(log = log)
+
+	data = asyncio.run(input_parser.fetchData(input_data, verify_names))
 	db = DBInterface(db_path, overwrite_file, log)
 	
 	data_keys = data.columns

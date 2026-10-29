@@ -5,32 +5,55 @@ import asyncio
 import sys, os
 import pandas as pd
 from typing import Callable, Literal
-	
-from src.utils.db_downloader import ROOT_DIR, getInfo
 
-class InputParser():
+from src.db.db_utils import getInfo
+
+class DBInputParser():
 	"""
 	Class for handling data import. Can handle an input of a single accession number and scientific name, or a CSV file containing multiple entries. The output is a list of lists, where each inner list contains an accession number and a scientific name. If only one entry is provided, the output is a list of two elements: the accession number and the scientific name.
 	"""
 
-	def __init__(self, user_input: str, input_type: Literal['csv', 'textarea'], log: Callable = print) -> None:
+	def __init__(self, log: Callable = print) -> None:
 		self.log = log
-		
-		if input_type == "csv":
-			self.output = self.parseCSV(user_input)
-		elif input_type == "textarea":
-			self.output = self.parseTextArea(user_input)
-		
-	def export(self) -> list:
+
+	async def parseInput(self, input_data, input_type: Literal['csv', 'textarea']) -> list:
 		"""
 		Get the parsed result.
 		Returns:
 			output (list) - list of parsed results
 		"""
 
-		return self.output
+		if input_type == "csv":
+			parsed_output = self._parseCSV(input_data)
+		elif input_type == "textarea":
+			parsed_output = self._parseTextArea(input_data)
+		else:
+			parsed_output = []
 
-	def parseCSV(self, user_input: str, delimiter: str = ';') -> list[list[str]]:
+		return parsed_output
+
+	async def fetchData(self, input_data: list, verify_names: bool) -> pd.DataFrame:
+		"""
+		Call on the Downloader to fetch data for all entries in the input list.
+		"""
+
+		data_list = []
+		for entry in input_data:
+			accession_number, scientific_name = entry
+
+			try:
+				data = await(getInfo(scientific_name, 'Automatic', verify=verify_names))
+				data.update({'AccessionNumber': accession_number})
+
+				data_list.append(data)
+				self.log(f"Fetched data for {accession_number} ({scientific_name}).",
+					update_step=1.0)
+			except Exception:
+				self.log(f"Data for {accession_number} ({scientific_name}) could not be fetched.")
+
+		return pd.DataFrame(data_list)
+
+	def _parseCSV(self, user_input: str, delimiter: str = ';') -> list[list[str]]:
 		"""
 		Parses genome accession numbers and scientific names from a CSV file.
 		Args:
@@ -54,7 +77,7 @@ class InputParser():
 		
 		return df.values.tolist()
 
-	def parseTextArea(self, user_input: str, delimiter: str = ';') -> list[list[str]]:
+	def _parseTextArea(self, user_input: str, delimiter: str = ';') -> list[list[str]]:
 		"""
 		Parses genome accession numbers and scientific names form a textual TextArea.
 		Args:
@@ -74,45 +97,3 @@ class InputParser():
 			self.log(update_step = 1)
 
 		return input_parsed
-
-
-async def parseData(input_data, input_type: Literal['csv', 'textarea'], log: Callable = print):
-	parser = InputParser(input_data, input_type, log)
-	parsed_input = parser.export()
-	return parsed_input
-
-
-async def fetchData(input_data: list, verify_names: bool, log: Callable = print) -> pd.DataFrame:
-	"""
-	Call on the Downloader to fetch data for all entries in the input list.
-	"""
-
-	data_list = []
-	for entry in input_data:
-		accession_number, scientific_name = entry
-
-		try:
-			data = await(getInfo(scientific_name, 'Automatic', verify = verify_names))
-			data.update({'AccessionNumber': accession_number})
-
-			data_list.append(data)
-			log(f"Fetched data for {accession_number} ({scientific_name}).",
-				update_step = 1.0)
-		except Exception:
-			log(f"Data for {accession_number} ({scientific_name}) could not be fetched.")
-
-	return pd.DataFrame(data_list)
-
-
-def main():
-	test_file = f"{ROOT_DIR}/test/test.csv"
-	test_list = ["GCA975310", "Bufo bufo"]
-
-	parsed = asyncio.run(parseData(test_file, "csv"))
-	df = asyncio.run(fetchData(parsed, False))
-	print(df)
-
-
-if __name__ == "__main__":
-	main()
-

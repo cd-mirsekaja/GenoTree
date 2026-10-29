@@ -1,12 +1,14 @@
 from setuptools import setup, find_packages
 import os
 
+from src.const import PROJECT_VERSION
+
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
 setup(
     name="genotree",
-    version="0.1.0",
+    version=PROJECT_VERSION,
     description="Perform a detailed phylogenetic analysis on a combined dataset of genomes and genes",
     author="Ronja Rösner",
     author_email="ronja.roesner@uni-oldenburg.de",
