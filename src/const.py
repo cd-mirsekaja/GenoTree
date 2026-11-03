@@ -1,4 +1,3 @@
-
 def getProjectRoot():
 	"""
 	Gets the project root directory, assuming this function is called
@@ -7,14 +6,28 @@ def getProjectRoot():
 	"""
 	from pathlib import Path
 	# Start from THIS file's directory
-	current_file = Path(__file__).resolve() # Using resolve to get an absolute path.
+	current_file = Path(__file__).resolve()  # Using resolve to get an absolute path.
 	# Go up directories until we find 'pyproject.toml'
-	for parent in current_file.parents: # Iterate over every parent.
-		if (parent / "src").exists(): # Checks if file exists
+	for parent in current_file.parents:  # Iterate over every parent.
+		if (parent / "src").exists():  # Checks if file exists
 			return parent
 	raise FileNotFoundError("Project root (with src) not found.")
 
+
+def getDatabasePath():
+	"""
+	Gets the correct path for the project database.
+	"""
+	import os
+	p_data = "/data"
+	p_db = "GenoTree_Database.db"
+	db_path = f"{ROOT_DIR}{p_data}/{p_db}"
+	
+	return db_path
+
+
 ROOT_DIR = getProjectRoot()
+DB_PATH = getDatabasePath()
 
 PROJECT_VERSION = "0.1.5"
 
