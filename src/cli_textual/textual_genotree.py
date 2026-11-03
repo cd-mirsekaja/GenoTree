@@ -14,6 +14,8 @@ from .screen_main import MainScreen
 from .screen_config import ConfigScreen		
 from .screen_database import DatabaseScreen
 
+from src.const import UI_THEME
+
 class HelpScreen(ModalScreen):
 	DEFAULT_CSS = """
 	#dialog {
@@ -128,6 +130,7 @@ class GenoTree(App):
 	def on_mount(self) -> None:
 		self.title = "GenoTree"
 		self.sub_title = "An Interactive Phylogenetics Pipeline"
+		self.theme = UI_THEME
 	
 
 if __name__ == "__main__":

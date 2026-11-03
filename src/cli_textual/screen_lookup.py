@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from textual import getters, work
+from textual import getters, work, events
 from textual.app import App, ComposeResult
-from textual.containers import VerticalScroll
+from textual.containers import VerticalScroll, Container
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widget import Widget
 from textual.widgets import Input, Markdown, Footer, Header, RadioSet, RadioButton, Checkbox
 
 from src.db.db_utils import getInfo
+from src.const import UI_THEME
 
 
 class Sidebar(Widget):
@@ -27,7 +28,7 @@ class Sidebar(Widget):
 				yield RadioButton("IRMNG",
 					  tooltip = "Query the Interim Register of Marine and Non-Marine Genera.")
 			yield Markdown("## Search Parameters...")
-			yield Checkbox("Verify Species Names",
+			yield Checkbox("Verify Names",
 				  tooltip = "Autocomplete for species name abbreviations, allows for fuzzy queries e.g. 'B. bubo Linn. 1700-'. This can lead to unexpected results if the query is not precise.",
 				  value = True)
 
@@ -40,13 +41,14 @@ class Sidebar(Widget):
 		await self.screen.query_one(InputResults).on_options_updated()
 
 class InputResults(Widget):
-	results = getters.query_one("#results", Markdown)
+	results = getters.query_one("#results-markdown", Markdown)
 	input = getters.query_one(Input)
 	
 	def compose(self) -> ComposeResult:
-		yield Input(placeholder = "Search for a taxon name...", id = "species-search")
-		with VerticalScroll(id = "results-container"):
-			yield Markdown(id = "results")
+		with Container(id = "input-results"):
+			yield Input(placeholder = "Search for a taxon name...", id = "species-search")
+			with VerticalScroll(id = "results-container"):
+				yield Markdown(id = "results-markdown")
 	
 	def on_mount(self):
 		self.update_options()
@@ -135,22 +137,30 @@ class LookupScreen(Screen):
 		"""Set or unset visible class when reactive changes."""
 		self.query_one(Sidebar).set_class(show_sidebar, "-visible")
 	
+	def on_mount(self) -> None:
+		self.query_one(InputResults).query_one(Input).focus()
+	
 	def compose(self) -> ComposeResult:
 		yield Header()
+		
 		yield Sidebar(id = "options-sidebar")
 		yield InputResults()
+		
 		yield Footer()
 
 
-class SpeciesLookup(App):
+class LookupApp(App):
+	CSS_PATH = "tcss/textual_genotree.tcss"
+	
 	def on_ready(self) -> None:
 		self.push_screen(LookupScreen())
 	
 	def on_mount(self) -> None:
 		self.title = "GenoTree Lookup"
 		self.sub_title = "quickly find taxonomic information on any level"
+		self.theme = UI_THEME
 	
 
 if __name__ == "__main__":
-	app = SpeciesLookup()
+	app = LookupApp()
 	app.run()

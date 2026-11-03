@@ -16,7 +16,7 @@ from textual.reactive import reactive
 
 from src.db.db_input_parser import DBInputParser
 from src.db.db_interface import DBInterface
-from src.const import ROOT_DIR
+from src.const import ROOT_DIR, UI_THEME
 
 class DirValidator(Validator):
 	"""Test if input is an existing directory."""
@@ -58,37 +58,43 @@ class SearchLeftPane(Widget):
 	path_selected = reactive
 
 	def compose(self) -> ComposeResult:
-		with VerticalScroll(id = "left-pane"):
-			yield Markdown("## Settings")
-			yield Markdown("General settings regarding the search.")
-			yield Checkbox("Overwrite existing database",
-				tooltip = "If checked, the existing database will be deleted and a new one will be created. This is useful if you want to update the database after changing the genome dataset.",
-				value = False,
-			   	id = "db-overwrite-check")
-			yield Checkbox("Verify Species Names",
-				tooltip = "Autocomplete for species name abbreviations, allows for fuzzy queries e.g. 'B. bubo Linn. 1700-'. This can lead to unexpected results if the query is not precise.",
-				value = True,
-				id = "verify-speciesname-check")
-
-			yield Markdown("## Data Input")
-			yield Markdown("Choose a file with valid input data or clear the current input.")
-			yield Input(value = str(self.dir_path),
-						placeholder = "Path to input file...",
-						id = "input-path",
-						validators = [
-							DirValidator()
-						])
-			yield FilteredDirectoryTree(self.dir_path)
-			with Horizontal():
-				yield Button("Choose File", id = "button-upload", variant = "primary")
-				yield Button("Clear Input", id = "button-clear-input", variant = "warning")
-				yield Button("Clear Table", id = "button-clear-table", variant = "warning")
-
-			yield Markdown("## Run")
-			yield Markdown("Test if the input can be correctly parsed or start the search.")
-			with Horizontal():
-				yield Button("Parse Input", id = "button-parse", variant = "primary")
-				yield Button("Submit Input", id = "button-submit", variant = "success")
+		with VerticalScroll(id = "search-left-pane"):
+			with Container(id = "search-settings-checkboxes"):
+				yield Markdown("## Settings")
+				yield Markdown("General settings regarding the search.")
+				yield Checkbox("Overwrite existing database",
+					tooltip = "If checked, the existing database will be deleted and a new one will be created. This is useful if you want to update the database after changing the genome dataset.",
+					value = False,
+					id = "db-overwrite-check")
+				yield Checkbox("Verify Species Names",
+					tooltip = "Autocomplete for species name abbreviations, allows for fuzzy queries e.g. 'B. bubo Linn. 1700-'. This can lead to unexpected results if the query is not precise.",
+					value = True,
+					id = "verify-speciesname-check")
+			
+			with Container(id = "search-settings-input"):
+				yield Markdown("## Data Input")
+				yield Markdown("Choose a file with valid input data or clear the current input.")
+				with Container(id = "search-settings-input-tree"):
+					
+					with Horizontal():
+						yield Input(value = str(self.dir_path),
+									placeholder = "Path to input file...",
+									id = "input-path",
+									validators = [
+										DirValidator()
+									])
+						yield Button("Select", id = "button-upload", variant = "default", flat = True)
+					yield FilteredDirectoryTree(self.dir_path)
+				with Horizontal():
+					yield Button("Clear Input", id = "button-clear-input", variant = "default", flat = True)
+					yield Button("Clear Table", id = "button-clear-table", variant = "default", flat = True)
+			
+			with Container(id = "search-settings-run"):
+				yield Markdown("## Run")
+				yield Markdown("Test if the input can be correctly parsed or start the search.")
+				with Horizontal():
+					yield Button("Parse Input", id = "button-parse", variant = "primary")
+					yield Button("Submit Input", id = "button-submit", variant = "success")
 
 	def update_dirtree(self, new_path) -> None:
 		self.query_one(FilteredDirectoryTree).path = new_path
@@ -140,6 +146,7 @@ class SearchLeftPane(Widget):
 			self.screen.query_one(SearchRightPane).update_log("Parsed from Input:")
 			for acn, scn in parsed_input:
 				self.screen.query_one(SearchRightPane).update_log(f"{acn} - {scn}")
+			self.screen.query_one(SearchRightPane).update_log(" ")
 	
 	async def button_submit(self):
 		input_parser = DBInputParser(log = self.screen.query_one(SearchRightPane).update_log)
@@ -160,12 +167,12 @@ class SearchLeftPane(Widget):
 			self.screen.query_one(SearchRightPane).update_log("Fetched data added to overview table.")
 			self.screen.query_one(SearchMiddlePane).query_one(TabbedContent).active = "search-overview"
 			
-			
 			db_overwrite = self.query_one("#db-overwrite-check", Checkbox).value
 			db = DBInterface(db_overwrite = db_overwrite,
 				log = self.screen.query_one(SearchRightPane).update_log)
 			db.updateDB(fetched_data)
 			self.screen.query_one(SearchRightPane).update_log("Fetched data added to project database.")
+			self.screen.query_one(SearchRightPane).update_log(" ")
 			
 			
 
@@ -174,7 +181,7 @@ class SearchMiddlePane(Widget):
 	Widgets for the middle pane of the UI.
 	"""
 	def compose(self) -> ComposeResult:
-		with Vertical(id = "middle-pane"):
+		with Vertical(id = "search-middle-pane"):
 			with TabbedContent():
 				with TabPane("Input", id = "search-input"):
 					yield Label()
@@ -202,11 +209,11 @@ class SearchRightPane(Widget):
 	Widgets for the right pane of the UI.
 	"""
 	def compose(self) -> ComposeResult:
-		with VerticalScroll(id = "right-pane"):
+		with VerticalScroll(id = "search-right-pane"):
 			yield Markdown("## Log")
 			with Container():
 				yield ProgressBar(show_eta = False)
-				yield RichLog(highlight = True, wrap = True)
+				yield RichLog(highlight = True, markup = True, wrap = True)
 
 	def update_log(self, update_text: str = "", update_step: float = 0.0) -> None:
 		if update_text != "":
@@ -223,7 +230,7 @@ class SearchRightPane(Widget):
 
 class SearchPane(Widget):
 	def compose(self):
-		with Container(id="app-grid"):
+		with Container(id = "app-grid"):
 			yield SearchLeftPane()
 			yield SearchMiddlePane()
 			yield SearchRightPane()
@@ -238,23 +245,27 @@ class DatabaseScreen(Screen):
 
 	def compose(self) -> ComposeResult:
 		yield Header()
-		yield Footer()
 
-		with Vertical(id = "main-pane"):
+		with Container(id = "main-pane"):
 			with TabbedContent(*["Fetch new data", "Edit current database"]):
 				with Container():
 					yield SearchPane()
 				with Container():
 					yield Markdown("Database editing")
+					
+		yield Footer()
 
 
 class DatabaseApp(App):
+	CSS_PATH = "tcss/textual_genotree.tcss"
+	
 	def on_ready(self) -> None:
 		self.push_screen(DatabaseScreen())
 
 	def on_mount(self) -> None:
 		self.title = "GenoTree Database"
 		self.sub_title = "manage the GenoTree Database"
+		self.theme = UI_THEME
 
 
 if __name__ == "__main__":

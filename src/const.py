@@ -29,7 +29,7 @@ def getDatabasePath():
 ROOT_DIR = getProjectRoot()
 DB_PATH = getDatabasePath()
 
-PROJECT_VERSION = "0.1.5"
+PROJECT_VERSION = "0.1.7"
 
 DATABASE_SCHEMA = {
 	"taxonomy": {
@@ -66,3 +66,5 @@ DATABASE_SCHEMA = {
 		"isExtinct": 'blob'
 	}
 }
+
+UI_THEME = "rose-pine"

@@ -27,12 +27,18 @@ Sidebar#options-sidebar {
 	}
 }
 
-Input#species-search {
-	dock: top;
-	margin: 1 0;
+#input-results {
+    width: 99%;
+    border: none #696D7D;
 }
 
-#results {
+Input#species-search {
+	dock: top;
+	margin: 0 0;
+    border: heavy #68B0AB;
+}
+
+#results-markdown {
 	width: 100%;
 	height: auto;
 }
@@ -41,10 +47,5 @@ Input#species-search {
 	background: $surface;
 	margin: 0 0 0 0;
 	height: 98%;
-	overflow: hidden auto;
-	border: tall transparent;
-}
-
-#results-container:focus {
-	border: tall $border;
+    border: heavy #68B0AB;
 }

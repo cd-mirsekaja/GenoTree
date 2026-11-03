@@ -11,7 +11,7 @@ from typing import Callable
 
 from src.db.db_input_parser import DBInputParser
 
-from src.const import DATABASE_SCHEMA, ROOT_DIR, DB_PATH
+from src.const import DATABASE_SCHEMA, DB_PATH
 
 
 class DBInterface():

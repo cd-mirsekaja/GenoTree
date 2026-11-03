@@ -5,3 +5,22 @@ HelpScreen {
 QuitScreen {
     align: center middle;
 }
+
+Button {
+    margin: 1 1;
+    width: 20%;
+}
+
+Checkbox {
+    width: 95%;
+    margin: 0 1;
+    border: round #8FC0A9;
+    background: $surface;
+}
+
+RadioSet {
+    width: 95%;
+    margin: 0 1;
+    border: round #8FC0A9;
+    background: $surface;
+}

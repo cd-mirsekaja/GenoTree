@@ -5,47 +5,89 @@
     grid-rows: 1fr;
 }
 
-#left-pane {
-    width: 99%;
-    height: 98%;
-    border: darkolivegreen;
-    align: center top;
-}
-
-#left-pane-input {
-}
-
-#middle-pane {
-    width: 99%;
-    height: 98%;
-    border: darkolivegreen;
-}
-
-#right-pane {
-    width: 99%;
-    height: 98%;
-    border: darkolivegreen;
-}
-
 #main-pane {
     width: 99%;
-    height: 98%;
-    border: darkolivegreen;
+    border: none #696D7D;
     align: center top;
+}
+
+#search-left-pane {
+    min-width: 50%;
+    max-width: 100%;
+    border: heavy #68B0AB;
+}
+
+#search-middle-pane {
+    min-width: 40%;
+    max-width: 100%;
+    border: heavy #68B0AB;
+}
+
+#search-right-pane {
+    min-width: 40%;
+    max-width: 100%;
+    border: heavy #68B0AB;
+}
+
+#search-settings-checkboxes {
+    align: center top;
+    border: none #68B0AB;
+    height: 25%;
+}
+
+#search-settings-input {
+    border: hkey #68B0AB;
+    height: 55%;
+}
+
+#search-settings-input-tree {
+    border: hkey #68B0AB;
+    width: 95%;
+    height: 50%;
+}
+
+#search-settings-run {
+    align: center top;
+    border: none #68B0AB;
+    height: 20%;
+}
+
+Input#input-path {
+    margin: 0 0;
+    border: solid #8FC0A9;
+    width: 70%;
+}
+
+#button-upload {
+    margin: 0 0;
+    width: 20%;
+    border: round #8FC0A9;
+}
+
+DirectoryTree {
+    height: 80%;
+    width: 100%;
+    margin: 0 0;
+}
+
+#button-clear-input {
+    border: round #8FC0A9;
+}
+
+#button-clear-table {
+    border: round #8FC0A9;
+    background: $surface;
+}
+
+TextArea {
+    border: none;
 }
 
 ProgressBar {
     dock: top;
-}
-TextArea {
-    height: 95%;
+    width: 98%;
 }
 
-Checkbox {
-    width: 95%;
-}
-
-DirectoryTree {
-    height: 30%;
-    content-align: left top;
+RichLog {
+    text-wrap: wrap;
 }
