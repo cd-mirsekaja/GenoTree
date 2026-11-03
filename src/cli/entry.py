@@ -24,11 +24,18 @@ from .cmd_docs import cli_docs
 from .cmd_lookup import cli_lookup
 from .cmd_run import cli_run
 
+from src.const import PROJECT_VERSION
+
 ## set the main parser
 main_parser = argparse.ArgumentParser(
 	prog = "genotree",
 	description = "genotree <operation> [options] - phylogenetic analysis pipeline"
 	)
+main_parser.add_argument(
+	"-v", "--version",
+	action = "version",
+	version =f"GenoTree version {PROJECT_VERSION}"
+)
 main_parser.set_defaults(func = cli_genotree)
 
 ## subparser manager
