@@ -62,9 +62,9 @@ async def getInfo(scientific_name: str, platform: Literal['Automatic', 'WoRMS', 
 
 	# create an index from the input name. If no whitespace is in the name, only take the first three letters
 	try:
-		idx = f"{datetime.now().strftime('%y%m%d_%H%M')}.{scientific_name[:3]}_{scientific_name.split()[1][:3]}"
+		idx = f"{datetime.now().strftime('%y%m%d_%H%M%S')}.{scientific_name[:3]}_{scientific_name.split()[1][:3]}"
 	except IndexError:
-		idx = f"{datetime.now().strftime('%y%m%d_%H%M')}.{scientific_name[:3]}"
+		idx = f"{datetime.now().strftime('%y%m%d_%H%M%S')}.{scientific_name[:3]}"
 
 
 	# create dictionary with one entry

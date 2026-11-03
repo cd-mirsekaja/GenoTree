@@ -1,3 +1,4 @@
+import os
 import pandas
 
 from pathlib import Path
@@ -14,6 +15,7 @@ from textual.validation import ValidationResult, Validator
 from textual.reactive import reactive
 
 from src.db.db_input_parser import DBInputParser
+from src.db.db_interface import DBInterface
 from src.const import ROOT_DIR
 
 class DirValidator(Validator):
@@ -61,10 +63,12 @@ class SearchLeftPane(Widget):
 			yield Markdown("General settings regarding the search.")
 			yield Checkbox("Overwrite existing database",
 				tooltip = "If checked, the existing database will be deleted and a new one will be created. This is useful if you want to update the database after changing the genome dataset.",
-				value = False)
+				value = False,
+			   	id = "db-overwrite-check")
 			yield Checkbox("Verify Species Names",
 				tooltip = "Autocomplete for species name abbreviations, allows for fuzzy queries e.g. 'B. bubo Linn. 1700-'. This can lead to unexpected results if the query is not precise.",
-				value = True)
+				value = True,
+				id = "verify-speciesname-check")
 
 			yield Markdown("## Data Input")
 			yield Markdown("Choose a file with valid input data or clear the current input.")
@@ -78,6 +82,7 @@ class SearchLeftPane(Widget):
 			with Horizontal():
 				yield Button("Choose File", id = "button-upload", variant = "primary")
 				yield Button("Clear Input", id = "button-clear-input", variant = "warning")
+				yield Button("Clear Table", id = "button-clear-table", variant = "warning")
 
 			yield Markdown("## Run")
 			yield Markdown("Test if the input can be correctly parsed or start the search.")
@@ -96,46 +101,73 @@ class SearchLeftPane(Widget):
 			self.update_dirtree(event.value)
 
 	async def on_button_pressed(self, event: Button.Pressed) -> None:
-		input_parser = DBInputParser(log = self.screen.query_one(SearchRightPane).update_log)
-
 		if event.button.id == "button-upload":
-			file_path = self.path_selected
+			await self.button_upload()
+		elif event.button.id == "button-clear-input":
+			await self.button_clear_input()
+		elif event.button.id == "button-clear-table":
+			await self.button_clear_table()
+		elif event.button.id == "button-parse":
+			await self.button_parse()
+		elif event.button.id == "button-submit":
+			await self.button_submit()
+	
+	async def button_upload(self):
+		file_path = self.path_selected
+		if not os.path.isfile(file_path):
+			self.screen.query_one(SearchRightPane).update_log("Current selection is not a valid file.")
+		else:
 			with open(file = file_path, mode = "r") as file:
 				lines = file.readlines()
 				self.screen.query_one(SearchMiddlePane).query_one(TextArea).insert(''.join(lines))
-
-		elif event.button.id == "button-clear-input":
-			self.screen.query_one(SearchMiddlePane).query_one(TextArea).clear()
-
-		elif event.button.id == "button-parse":
-			input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
+		
+		self.screen.query_one(SearchMiddlePane).query_one(TextArea).focus()
+	
+	async def button_clear_input(self):
+		self.screen.query_one(SearchMiddlePane).query_one(TextArea).clear()
+	
+	async def button_clear_table(self):
+		self.screen.query_one(SearchMiddlePane).query_one(DataTable).clear()
+	
+	async def button_parse(self):
+		input_parser = DBInputParser(log = self.screen.query_one(SearchRightPane).update_log)
+		input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
+		self.screen.query_one(SearchRightPane).reset_progress()
+		
+		parsed_input = await input_parser.parseInput(input_text, "textarea")
+		
+		if parsed_input:
+			self.screen.query_one(SearchRightPane).update_log("Parsed from Input:")
+			for acn, scn in parsed_input:
+				self.screen.query_one(SearchRightPane).update_log(f"{acn} - {scn}")
+	
+	async def button_submit(self):
+		input_parser = DBInputParser(log = self.screen.query_one(SearchRightPane).update_log)
+		input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
+		
+		parsed_input = await input_parser.parseInput(input_text, "textarea")
+		
+		if parsed_input:
+			input_len = len(parsed_input)
+			
 			self.screen.query_one(SearchRightPane).reset_progress()
-
-			parsed_input = await input_parser.parseInput(input_text, "textarea")
-
-			if parsed_input:
-				self.screen.query_one(SearchRightPane).update_log("Parsed from Input:")
-				for acn, scn in parsed_input:
-					self.screen.query_one(SearchRightPane).update_log(f"{acn} - {scn}")
-
-		elif event.button.id == "button-submit":
-			input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
-
-			parsed_input = await input_parser.parseInput(input_text, "textarea")
-
-			if parsed_input:
-				input_len = len(parsed_input)
-
-				self.screen.query_one(SearchRightPane).reset_progress()
-				self.screen.query_one(SearchRightPane).update_steps(input_len)
-
-				self.screen.query_one(SearchRightPane).update_log(f"Fetching data for {input_len} entries...")
-				fetched_data = await input_parser.fetchData(parsed_input, False)
-
-				self.screen.query_one(SearchMiddlePane).update_table(fetched_data)
-				self.screen.query_one(SearchRightPane).update_log("Fetched data added to overview table.")
-				self.screen.query_one(SearchMiddlePane).query_one(TabbedContent).active = "search-overview"
-
+			self.screen.query_one(SearchRightPane).update_steps(input_len)
+			
+			self.screen.query_one(SearchRightPane).update_log(f"Fetching data for {input_len} entries...")
+			fetched_data = await input_parser.fetchData(parsed_input, False)
+			
+			self.screen.query_one(SearchMiddlePane).update_table(fetched_data)
+			self.screen.query_one(SearchRightPane).update_log("Fetched data added to overview table.")
+			self.screen.query_one(SearchMiddlePane).query_one(TabbedContent).active = "search-overview"
+			
+			
+			db_overwrite = self.query_one("#db-overwrite-check", Checkbox).value
+			db = DBInterface(db_overwrite = db_overwrite,
+				log = self.screen.query_one(SearchRightPane).update_log)
+			db.updateDB(fetched_data)
+			self.screen.query_one(SearchRightPane).update_log("Fetched data added to project database.")
+			
+			
 
 class SearchMiddlePane(Widget):
 	"""
@@ -177,8 +209,10 @@ class SearchRightPane(Widget):
 				yield RichLog(highlight = True, wrap = True)
 
 	def update_log(self, update_text: str = "", update_step: float = 0.0) -> None:
-		self.query_one(RichLog).write(update_text)
-		self.query_one(ProgressBar).advance(update_step)
+		if update_text != "":
+			self.query_one(RichLog).write(update_text)
+		if update_step != 0.0:
+			self.query_one(ProgressBar).advance(update_step)
 
 	def update_steps(self, steps_total: float| None):
 		self.query_one(ProgressBar).update(total = steps_total)

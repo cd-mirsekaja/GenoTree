@@ -46,10 +46,12 @@ class DBInputParser():
 				data.update({'AccessionNumber': accession_number})
 
 				data_list.append(data)
-				self.log(f"Fetched data for {accession_number} ({scientific_name}).",
-					update_step=1.0)
-			except Exception:
-				self.log(f"Data for {accession_number} ({scientific_name}) could not be fetched.")
+				self.log(f"Fetched data for {accession_number} ({scientific_name}).")
+			except Exception as e:
+				self.log(f"Data for {accession_number} ({scientific_name}) could not be fetched. Exception: {e}")
+			
+			if self.log != print:
+				self.log(update_step = 1.0)
 
 		return pd.DataFrame(data_list)
 
@@ -94,6 +96,6 @@ class DBInputParser():
 			else:
 				self.log(f"Error: {line} could not be parsed.")
 
-			self.log(update_step = 1)
+			self.log(update_step = 1.0)
 
 		return input_parsed
