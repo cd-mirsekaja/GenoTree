@@ -142,11 +142,10 @@ class LookupScreen(Screen):
 	
 	def compose(self) -> ComposeResult:
 		yield Header()
+		yield Footer()
 		
 		yield Sidebar(id = "options-sidebar")
 		yield InputResults()
-		
-		yield Footer()
 
 
 class LookupApp(App):

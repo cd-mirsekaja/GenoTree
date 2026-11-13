@@ -105,12 +105,12 @@ class GenoTree(App):
 	}
 
 	BINDINGS = [
-		Binding(key = "question_mark", action = "help", description = "Help", key_display = "?"),
-		#Binding(key = "ctrl+q", action = "request_quit", description = "Quit"),
-		("ctrl+m", "switch_screen('main')", "Main Menu"),
-		("ctrl+f", "switch_screen('config')", "Config"),
-		("ctrl+d", "switch_screen('database')", "Database"),
-		("ctrl+l", "switch_screen('lookup')", "Lookup"),
+		#Binding(key = "question_mark", action = "help", description = "Help", key_display = "?", priority = True),
+		#Binding(key = "ctrl+q", action = "request_quit", description = "Quit", priority = True),
+		Binding(key = "ctrl+y", action = "switch_screen('main')", description = "Main Menu", priority = True),
+		Binding(key = "ctrl+f", action = "switch_screen('config')", description = "Config", priority = True),
+		Binding(key = "ctrl+d", action = "switch_screen('database')", description = "Database", priority = True),
+		Binding(key = "ctrl+l", action = "switch_screen('lookup')", description = "Lookup", priority = True),
 		]
 
 	def action_help(self) -> None:

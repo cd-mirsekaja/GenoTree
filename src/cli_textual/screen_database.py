@@ -4,19 +4,20 @@ import pandas
 from pathlib import Path
 from typing import Iterable
 
+from textual import on
 from textual.app import App, ComposeResult
 from textual.screen import Screen
 from textual.containers import Container, Vertical, VerticalScroll, Horizontal
 from textual.widget import Widget
 from textual.widgets import Footer, Header, Markdown, Button, RichLog, Input, TextArea, TabbedContent, \
-	Checkbox, ProgressBar, DataTable, Label, DirectoryTree, TabPane
+	Checkbox, ProgressBar, DataTable, Label, DirectoryTree, TabPane, OptionList, Select
 from textual.validation import ValidationResult, Validator
 
 from textual.reactive import reactive
 
 from src.db.db_input_parser import DBInputParser
 from src.db.db_interface import DBInterface
-from src.const import ROOT_DIR, UI_THEME
+from src.const import ROOT_DIR, UI_THEME, DATABASE_SCHEMA
 
 class DirValidator(Validator):
 	"""Test if input is an existing directory."""
@@ -93,8 +94,8 @@ class SearchLeftPane(Widget):
 				yield Markdown("## Run")
 				yield Markdown("Test if the input can be correctly parsed or start the search.")
 				with Horizontal():
-					yield Button("Parse Input", id = "button-parse", variant = "primary")
-					yield Button("Submit Input", id = "button-submit", variant = "success")
+					yield Button("Parse Input", id = "button-parse-input", variant = "primary")
+					yield Button("Submit Input", id = "button-submit-input", variant = "success")
 
 	def update_dirtree(self, new_path) -> None:
 		self.query_one(FilteredDirectoryTree).path = new_path
@@ -113,9 +114,9 @@ class SearchLeftPane(Widget):
 			await self.button_clear_input()
 		elif event.button.id == "button-clear-table":
 			await self.button_clear_table()
-		elif event.button.id == "button-parse":
+		elif event.button.id == "button-parse-input":
 			await self.button_parse()
-		elif event.button.id == "button-submit":
+		elif event.button.id == "button-submit-input":
 			await self.button_submit()
 	
 	async def button_upload(self):
@@ -201,7 +202,7 @@ class SearchMiddlePane(Widget):
 			for col in df.columns.tolist():
 				table.add_column(col)
 
-		table.add_rows(list(df.itertuples(index=False, name=None)))
+		table.add_rows(list(df.itertuples(index = False, name = None)))
 
 
 class SearchRightPane(Widget):
@@ -230,10 +231,56 @@ class SearchRightPane(Widget):
 
 class SearchPane(Widget):
 	def compose(self):
-		with Container(id = "app-grid"):
+		with Container(id = "search-app-grid"):
 			yield SearchLeftPane()
 			yield SearchMiddlePane()
 			yield SearchRightPane()
+	
+	def on_mount(self):
+		self.query_one(TextArea).focus()
+
+class DBLeftPane(Widget):
+	current_table = reactive("taxonomy")
+	
+	def compose(self):
+		with VerticalScroll(id = "db-left-pane"):
+			with Container(id = "db-options-container"):
+				yield Select([("Taxonomy", "taxonomy"), ("Identifiers", "identifiers"), ("Traits", "traits")], value = "taxonomy")
+			with Container(id = "db-table-container"):
+				yield DataTable(id = "db-table")
+	
+	def setDBTable(self, db_table: str):
+		db = DBInterface(log = self.screen.query_one(DBRightPane).update_log)
+		db_rows = db.readTable(db_table)
+		db_cols = [*DATABASE_SCHEMA[db_table]]
+		table = self.query_one(DataTable)
+		table.clear(columns = True)
+		table.add_columns(*db_cols)
+		table.add_rows(db_rows)
+		
+	@on(Select.Changed)
+	def select_changed(self, event: Select.Changed):
+		self.current_table = str(event.value)
+		self.setDBTable(self.current_table)
+		
+
+class DBRightPane(Widget):
+	def compose(self):
+		with VerticalScroll(id = "db-right-pane"):
+			yield Markdown("## Log")
+			with Container():
+				yield RichLog(highlight = True, markup = True, wrap = True)
+	
+	def update_log(self, update_text: str = "") -> None:
+		if update_text != "":
+			self.query_one(RichLog).write(update_text)
+
+
+class DBPane(Widget):
+	def compose(self):
+		with Container(id = "db-app-grid"):
+			yield DBLeftPane()
+			yield DBRightPane()
 
 
 class DatabaseScreen(Screen):
@@ -245,16 +292,14 @@ class DatabaseScreen(Screen):
 
 	def compose(self) -> ComposeResult:
 		yield Header()
+		yield Footer()
 
 		with Container(id = "main-pane"):
 			with TabbedContent(*["Fetch new data", "Edit current database"]):
 				with Container():
 					yield SearchPane()
 				with Container():
-					yield Markdown("Database editing")
-					
-		yield Footer()
-
+					yield DBPane()
 
 class DatabaseApp(App):
 	CSS_PATH = "tcss/textual_genotree.tcss"

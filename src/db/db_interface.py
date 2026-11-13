@@ -31,17 +31,31 @@ class DBInterface():
 
 		self._initializeDB(db_overwrite)
 
-	def readData(self, cols: list, table_name: str):
+	def readColumns(self, table_name: str, cols: list) -> list:
 		self._connect()
 		sql_query = f"SELECT {', '.join(cols)} FROM {table_name}"
 		self.cursor.execute(sql_query)
 		
-		res = self.cursor.fetchall()
+		rows = self.cursor.fetchall()
 		self.conn.commit()
 		self._disconnect()
 		
-		return res
+		self.log(f"Fetched columns {cols} for table {table_name}.")
 		
+		return rows
+	
+	def readTable(self, table_name: str) -> list:
+		self._connect()
+		sql_query = f"SELECT * FROM {table_name}"
+		self.cursor.execute(sql_query)
+		
+		rows = self.cursor.fetchall()
+		self.conn.commit()
+		self._disconnect()
+		
+		self.log(f"Fetched all data for table {table_name}.")
+		
+		return rows
 
 	def insertData(self, table_name: str, df: pd.DataFrame) -> None:
 		"""
@@ -153,7 +167,7 @@ if __name__ == "__main__":
 	data = asyncio.run(input_parser.fetchData(name_list, True))
 	db.updateDB(data)
 	
-	print(db.readData(["tKingdom", "tClass", "tOrder", "ScientificName"], "taxonomy"))
+	print(db.readColumns("taxonomy", ["tKingdom", "tClass", "tOrder", "ScientificName"]))
 	
 	
 

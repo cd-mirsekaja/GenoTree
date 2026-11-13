@@ -1,8 +1,15 @@
-#app-grid {
+#search-app-grid {
     layout: grid;
     grid-size: 3;  /* three columns */
     grid-columns: 1fr 2fr 1fr;
     grid-rows: 1fr;
+}
+
+#db-app-grid {
+    layout: grid;
+    grid-size: 2;  /* three columns */
+    grid-columns: 2fr 1fr;
+    grid-rows: 1fr 3fr;
 }
 
 #main-pane {
@@ -25,6 +32,18 @@
 
 #search-right-pane {
     min-width: 40%;
+    max-width: 100%;
+    border: heavy #68B0AB;
+}
+
+#db-left-pane {
+    min-width: 60%;
+    max-width: 100%;
+    border: heavy #68B0AB;
+}
+
+#db-right-pane {
+    min-width: 30%;
     max-width: 100%;
     border: heavy #68B0AB;
 }
@@ -79,6 +98,14 @@ DirectoryTree {
     background: $surface;
 }
 
+#button-parse-input {
+    margin: 1 1;
+}
+
+#button-submit-input {
+    margin: 1 1;
+}
+
 TextArea {
     border: none;
 }
@@ -90,4 +117,22 @@ ProgressBar {
 
 RichLog {
     text-wrap: wrap;
+}
+
+#db-options-container {
+    border: none #68B0AB;
+    height: 10%;
+}
+
+#db-table-container {
+    border: none #68B0AB;
+    height: 90%;
+}
+
+Select {
+    width: 40%;
+}
+
+#db-table {
+    height: 100%;
 }
