@@ -1,5 +1,6 @@
 import pandas as pd
 
+from src.const import FIELD_MAPPINGS
 from src.db.db_downloader import DBDownloader
 
 class DBMerger():
@@ -18,7 +19,7 @@ class DBMerger():
 		return self._mergeDicts()
 
 	def _extractValues(self):
-		fields = self._mapFields()
+		fields = FIELD_MAPPINGS
 		results_mapped = {}
 		for platform in self.results:
 			results_mapped[platform] = {}
@@ -27,6 +28,9 @@ class DBMerger():
 					res = self.results[platform][key_res]
 					if isinstance(res, str):
 						res = res.capitalize() if key_exp != "Citation" and key_exp != "Authority" else res
+					results_mapped[platform][key_exp] = res
+				if key_res in self.ids.keys():
+					res = self.ids[key_res]
 					results_mapped[platform][key_exp] = res
 
 		return results_mapped
@@ -66,57 +70,3 @@ class DBMerger():
 			merged.update({key: _normalizeContent(content)})
 
 		return(merged)
-
-	def _mapFields(self):
-		field_mappings = {
-			"WoRMS": {
-				'rank': 'Rank',
-				'status': 'Status',
-				'kingdom': 'tKingdom',
-				'phylum': 'tPhylum',
-				'class': 'tClass',
-				'order': 'tOrder',
-				'family': 'tFamily',
-				'genus': 'tGenus',
-				'scientificname': 'ScientificName',
-				'isMarine': 'isMarine',
-				'isBrackish': 'isBrackish',
-				'isFreshwater': 'isFreshwater',
-				'isTerrestrial': 'isTerrestrial',
-				'isExtinct': 'isExtinct',
-				'citation': 'Citation'
-			},
-			"GBIF": {
-				'rank': 'Rank',
-				'taxonomicStatus': 'Status',
-				'kingdom': 'tKingdom',
-				'phylum': 'tPhylum',
-				'class': 'tClass',
-				'order': 'tOrder',
-				'family': 'tFamily',
-				'genus': 'tGenus',
-				'canonicalName': 'ScientificName',
-				'authorship': "Authority",
-				'vernacularName': 'Vernacular_ENG'
-			},
-			"IRMNG": {
-				'rank': 'Rank',
-				'status': 'Status',
-				'kingdom': 'tKingdom',
-				'phylum': 'tPhylum',
-				'class': 'tClass',
-				'order': 'tOrder',
-				'family': 'tFamily',
-				'genus': 'tGenus',
-				'scientificname': 'ScientificName',
-				'authority': 'Authority',
-				'isMarine': 'isMarine',
-				'isBrackish': 'isBrackish',
-				'isFreshwater': 'isFreshwater',
-				'isTerrestrial': 'isTerrestrial',
-				'isExtinct': 'isExtinct',
-				'citation': 'Citation'
-			}
-		}
-
-		return field_mappings

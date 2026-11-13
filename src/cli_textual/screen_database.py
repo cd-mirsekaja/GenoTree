@@ -64,7 +64,7 @@ class SearchLeftPane(Widget):
 				yield Markdown("## Settings")
 				yield Markdown("General settings regarding the search.")
 				yield Checkbox("Overwrite existing database",
-					tooltip = "If checked, the existing database will be deleted and a new one will be created. This is useful if you want to update the database after changing the genome dataset.",
+					tooltip = "If checked, the existing database will be deleted and a new one will be created. BE VERY CAREFUL WITH THIS!",
 					value = False,
 					id = "db-overwrite-check")
 				yield Checkbox("Verify Species Names",
@@ -88,7 +88,6 @@ class SearchLeftPane(Widget):
 					yield FilteredDirectoryTree(self.dir_path)
 				with Horizontal():
 					yield Button("Clear Input", id = "button-clear-input", variant = "default", flat = True)
-					yield Button("Clear Table", id = "button-clear-table", variant = "default", flat = True)
 			
 			with Container(id = "search-settings-run"):
 				yield Markdown("## Run")
@@ -112,8 +111,6 @@ class SearchLeftPane(Widget):
 			await self.button_upload()
 		elif event.button.id == "button-clear-input":
 			await self.button_clear_input()
-		elif event.button.id == "button-clear-table":
-			await self.button_clear_table()
 		elif event.button.id == "button-parse-input":
 			await self.button_parse()
 		elif event.button.id == "button-submit-input":
@@ -132,9 +129,6 @@ class SearchLeftPane(Widget):
 	
 	async def button_clear_input(self):
 		self.screen.query_one(SearchMiddlePane).query_one(TextArea).clear()
-	
-	async def button_clear_table(self):
-		self.screen.query_one(SearchMiddlePane).query_one(DataTable).clear()
 	
 	async def button_parse(self):
 		input_parser = DBInputParser(log = self.screen.query_one(SearchRightPane).update_log)
@@ -164,10 +158,6 @@ class SearchLeftPane(Widget):
 			self.screen.query_one(SearchRightPane).update_log(f"Fetching data for {input_len} entries...")
 			fetched_data = await input_parser.fetchData(parsed_input, False)
 			
-			self.screen.query_one(SearchMiddlePane).update_table(fetched_data)
-			self.screen.query_one(SearchRightPane).update_log("Fetched data added to overview table.")
-			self.screen.query_one(SearchMiddlePane).query_one(TabbedContent).active = "search-overview"
-			
 			db_overwrite = self.query_one("#db-overwrite-check", Checkbox).value
 			db = DBInterface(db_overwrite = db_overwrite,
 				log = self.screen.query_one(SearchRightPane).update_log)
@@ -176,34 +166,18 @@ class SearchLeftPane(Widget):
 			self.screen.query_one(SearchRightPane).update_log(" ")
 			
 			
-
+			
 class SearchMiddlePane(Widget):
 	"""
 	Widgets for the middle pane of the UI.
 	"""
 	def compose(self) -> ComposeResult:
 		with Vertical(id = "search-middle-pane"):
-			with TabbedContent():
-				with TabPane("Input", id = "search-input"):
-					yield Label()
-					with Container():
-						yield TextArea(placeholder = "AccessionNumber; ScientificName",
-									   id = "input-batch")
-				with TabPane("Overview", id = "search-overview"):
-					yield DataTable(id = "overview-table")
-
-	def reset_table(self):
-		self.query_one(DataTable).clear()
-
-	def update_table(self, df: pandas.DataFrame):
-		# add results to overview table
-		table = self.query_one(DataTable)
-		if not table.columns:
-			for col in df.columns.tolist():
-				table.add_column(col)
-
-		table.add_rows(list(df.itertuples(index = False, name = None)))
-
+			yield Label()
+			with Container():
+				yield Markdown("## Text Input")
+				yield TextArea(placeholder = "AccessionNumber; ScientificName",
+							   id = "input-batch")
 
 class SearchRightPane(Widget):
 	"""
@@ -241,12 +215,18 @@ class SearchPane(Widget):
 
 class DBLeftPane(Widget):
 	current_table = reactive("taxonomy")
+	selected_cell = reactive
 	
 	def compose(self):
-		with VerticalScroll(id = "db-left-pane"):
+		with Vertical(id = "db-left-pane"):
 			with Container(id = "db-options-container"):
-				yield Select([("Taxonomy", "taxonomy"), ("Identifiers", "identifiers"), ("Traits", "traits")], value = "taxonomy")
-			with Container(id = "db-table-container"):
+				with Horizontal():
+					yield Select([("Taxonomy", "taxonomy"), ("Identifiers", "identifiers"), ("Traits", "traits")], value = "taxonomy")
+					yield Input(id = "db-cell-input",
+								placeholder = "Select a cell...",
+								valid_empty = True,
+								disabled = True)
+			with VerticalScroll(id = "db-table-container"):
 				yield DataTable(id = "db-table")
 	
 	def setDBTable(self, db_table: str):
@@ -262,7 +242,39 @@ class DBLeftPane(Widget):
 	def select_changed(self, event: Select.Changed):
 		self.current_table = str(event.value)
 		self.setDBTable(self.current_table)
+		# reset input field
+		self.query_one(Input).clear()
+		self.query_one(Input).disabled = True
+		self.query_one(Input).placeholder = "Select a cell..."
+	
+	@on(DataTable.CellSelected)
+	def datatable_cell_selected(self, event: DataTable.CellSelected):
+		self.query_one(Input).clear()
+		self.query_one(Input).disabled = False
+		if not event.value is None:
+			self.query_one(Input).insert(event.value, 0)
+		else:
+			self.query_one(Input).insert("", 0)
+			self.query_one(Input).placeholder = ""
 		
+		self.selected_cell = event.cell_key
+		self.query_one(Input).focus()
+		
+	@on(Input.Submitted)
+	def input_submitted(self, event: Input.Submitted):
+		table = self.query_one(DataTable)
+		
+		# get coordinates for the selected cell
+		cell_coord = table.get_cell_coordinate(self.selected_cell.row_key, self.selected_cell.column_key)
+		# update the DataTable widget
+		table.update_cell_at(cell_coord, event.value, update_width = True)
+		# update the database
+		row_name = table.get_cell_at((cell_coord[0], 0))
+		col_name = str([column.label for column in table.ordered_columns][cell_coord[1]])
+		db = DBInterface(log = self.screen.query_one(DBRightPane).update_log)
+		db.setCellByIDX(self.current_table, row_name, col_name, event.value)
+		
+		self.screen.query_one(DBRightPane).update_log(f"Updated cell at {cell_coord} to {event.value}")
 
 class DBRightPane(Widget):
 	def compose(self):

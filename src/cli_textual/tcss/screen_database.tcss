@@ -8,7 +8,7 @@
 #db-app-grid {
     layout: grid;
     grid-size: 2;  /* three columns */
-    grid-columns: 2fr 1fr;
+    grid-columns: 3fr 1fr;
     grid-rows: 1fr 3fr;
 }
 
@@ -37,14 +37,12 @@
 }
 
 #db-left-pane {
-    min-width: 60%;
-    max-width: 100%;
+    min-width: 80%;
     border: heavy #68B0AB;
 }
 
 #db-right-pane {
-    min-width: 30%;
-    max-width: 100%;
+    min-width: 20%;
     border: heavy #68B0AB;
 }
 

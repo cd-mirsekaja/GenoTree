@@ -25,6 +25,7 @@ def getDatabasePath():
 	
 	return db_path
 
+UI_THEME = "rose-pine"
 
 ROOT_DIR = getProjectRoot()
 DB_PATH = getDatabasePath()
@@ -53,7 +54,6 @@ DATABASE_SCHEMA = {
 		"usageKey": 'text',
 		"IRMNG_ID": 'text',
 		"AphiaID": 'text',
-		"PESI_GUID": 'text'
 	},
 	"traits": {
 		"IDX": 'text primary key',
@@ -67,4 +67,56 @@ DATABASE_SCHEMA = {
 	}
 }
 
-UI_THEME = "rose-pine"
+FIELD_MAPPINGS = {
+	"WoRMS": {
+		'rank': 'Rank',
+		'status': 'Status',
+		'kingdom': 'tKingdom',
+		'phylum': 'tPhylum',
+		'class': 'tClass',
+		'order': 'tOrder',
+		'family': 'tFamily',
+		'genus': 'tGenus',
+		'scientificname': 'ScientificName',
+		'isMarine': 'isMarine',
+		'isBrackish': 'isBrackish',
+		'isFreshwater': 'isFreshwater',
+		'isTerrestrial': 'isTerrestrial',
+		'isExtinct': 'isExtinct',
+		'citation': 'Citation',
+		'WoRMS_id': 'AphiaID'
+	},
+	"GBIF": {
+		'rank': 'Rank',
+		'taxonomicStatus': 'Status',
+		'kingdom': 'tKingdom',
+		'phylum': 'tPhylum',
+		'class': 'tClass',
+		'order': 'tOrder',
+		'family': 'tFamily',
+		'genus': 'tGenus',
+		'canonicalName': 'ScientificName',
+		'authorship': "Authority",
+		'vernacularName': 'Vernacular_ENG',
+		'GBIF_id': 'usageKey'
+	},
+	"IRMNG": {
+		'rank': 'Rank',
+		'status': 'Status',
+		'kingdom': 'tKingdom',
+		'phylum': 'tPhylum',
+		'class': 'tClass',
+		'order': 'tOrder',
+		'family': 'tFamily',
+		'genus': 'tGenus',
+		'scientificname': 'ScientificName',
+		'authority': 'Authority',
+		'isMarine': 'isMarine',
+		'isBrackish': 'isBrackish',
+		'isFreshwater': 'isFreshwater',
+		'isTerrestrial': 'isTerrestrial',
+		'isExtinct': 'isExtinct',
+		'citation': 'Citation',
+		'IRMNG_id': 'IRMNG_ID'
+	}
+}

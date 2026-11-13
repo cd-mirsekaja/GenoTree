@@ -31,9 +31,9 @@ class DBDownloader():
 		self.id_urls = self._constructTypeURL("id")
 		# retrieve IDs and update ID variables
 		self.ids = await self._getIDs()
-		self.aphia_id = self.ids.get("WoRMS")
-		self.usagekey = self.ids.get("GBIF")
-		self.irmng_id = self.ids.get("IRMNG")
+		self.aphia_id = self.ids.get("WoRMS_id")
+		self.usagekey = self.ids.get("GBIF_id")
+		self.irmng_id = self.ids.get("IRMNG_id")
 
 		# update URL snippets with retrieved IDs
 		self.request_url_snippets = self._loadURLSnippets()
@@ -138,7 +138,7 @@ class DBDownloader():
 					if isinstance(result, dict):
 						nest_level = self.request_url_snippets[platform]["id"]["nested_keys"]
 						result = self._getNestedValue(result, nest_level)
-					ids[platform] = result
+					ids[f"{platform}_id"] = result
 				except Exception:
 					ids[platform] = {"error": f"Failed to parse JSON from {url}"}
 		return ids

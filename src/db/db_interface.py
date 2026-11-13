@@ -53,7 +53,7 @@ class DBInterface():
 		self.conn.commit()
 		self._disconnect()
 		
-		self.log(f"Fetched all data for table {table_name}.")
+		self.log(f"Loaded table {table_name}.")
 		
 		return rows
 
@@ -78,6 +78,13 @@ class DBInterface():
 		self.conn.commit()
 
 		self._disconnect()
+
+	def setCellByIDX(self, table_name: str, idx: str, col_name: str, value: str):
+		if table_name not in DATABASE_SCHEMA:
+			self.log(f"Error: Table '{table_name}' is not defined in the database schema.")
+			return
+		sql_query = f"UPDATE {table_name} SET {col_name} = '{value}' WHERE IDX = '{idx}'"
+		self._executeQuery(sql_query)
 
 	def removeData(self):
 		pass
@@ -125,6 +132,12 @@ class DBInterface():
 			self.conn.close()
 			self.cursor = None
 
+	def _executeQuery(self, sql_query):
+		self._connect()
+		self.cursor.execute(sql_query)
+		self.conn.commit()
+		self._disconnect()
+	
 	def _removeDB(self) -> None:
 		"""
 		Helper to remove an existing database file if required.
