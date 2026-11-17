@@ -1,6 +1,4 @@
 import os
-import pandas
-
 from pathlib import Path
 from typing import Iterable
 
@@ -12,7 +10,6 @@ from textual.widget import Widget
 from textual.widgets import Footer, Header, Markdown, Button, RichLog, Input, TextArea, TabbedContent, \
 	Checkbox, ProgressBar, DataTable, Label, DirectoryTree, TabPane, OptionList, Select
 from textual.validation import ValidationResult, Validator
-
 from textual.reactive import reactive
 
 from src.db.db_input_parser import DBInputParser

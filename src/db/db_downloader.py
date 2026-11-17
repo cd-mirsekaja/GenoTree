@@ -1,4 +1,3 @@
-import json
 import httpx
 
 #import wikipediaapi as wiki
