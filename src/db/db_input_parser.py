@@ -16,7 +16,7 @@ class DBInputParser():
 	def __init__(self, log: Callable = print) -> None:
 		self.log = log
 
-	async def parseInput(self, input_data, input_type: Literal['csv', 'textarea']) -> list:
+	async def parseInput(self, input_data, input_type: Literal['csv', 'textarea'], delimiter: Literal[';', ',', '\t']) -> list:
 		"""
 		Get the parsed result.
 		Returns:
@@ -24,9 +24,9 @@ class DBInputParser():
 		"""
 
 		if input_type == "csv":
-			parsed_output = self._parseCSV(input_data)
+			parsed_output = self._parseCSV(input_data, delimiter = delimiter)
 		elif input_type == "textarea":
-			parsed_output = self._parseTextArea(input_data)
+			parsed_output = self._parseTextArea(input_data, delimiter = delimiter)
 		else:
 			parsed_output = []
 

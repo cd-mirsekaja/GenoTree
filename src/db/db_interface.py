@@ -53,8 +53,6 @@ class DBInterface():
 		self.conn.commit()
 		self._disconnect()
 		
-		self.log(f"Loaded table {table_name}.")
-		
 		return rows
 
 	def insertData(self, table_name: str, df: pd.DataFrame) -> None:

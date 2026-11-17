@@ -57,6 +57,7 @@ class SearchLeftPane(Widget):
 
 	dir_path = reactive(ROOT_DIR)
 	path_selected = reactive
+	delimiter_selected = reactive(";")
 
 	def compose(self) -> ComposeResult:
 		with VerticalScroll(id = "search-left-pane"):
@@ -71,6 +72,12 @@ class SearchLeftPane(Widget):
 					tooltip = "Autocomplete for species name abbreviations, allows for fuzzy queries e.g. 'B. bubo Linn. 1700-'. This can lead to unexpected results if the query is not precise.",
 					value = True,
 					id = "verify-speciesname-check")
+				with Horizontal():
+					yield Label("Input delimiter: ")
+					yield Select(options = [("Semicolon", ";"), ("Komma", ","), ("Tab", "\t")],
+								 id = "delimiter-select",
+								 prompt = "Select input delimiter...",
+								 value = ";")
 			
 			with Container(id = "search-settings-input"):
 				yield Markdown("## Data Input")
@@ -98,6 +105,10 @@ class SearchLeftPane(Widget):
 
 	def update_dirtree(self, new_path) -> None:
 		self.query_one(FilteredDirectoryTree).path = new_path
+
+	async def on_select_changed(self, event: Select.Changed) -> None:
+		self.delimiter_selected = self.query_one(Select).value
+		self.screen.query_one(SearchMiddlePane).query_one(TextArea).placeholder = f"AccessionNumber{self.delimiter_selected}ScientificName"
 
 	async def on_tree_node_highlighted(self, event: FilteredDirectoryTree.NodeHighlighted):
 		self.path_selected = event.node.data.__dict__.get("path")
@@ -135,7 +146,7 @@ class SearchLeftPane(Widget):
 		input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
 		self.screen.query_one(SearchRightPane).reset_progress()
 		
-		parsed_input = await input_parser.parseInput(input_text, "textarea")
+		parsed_input = await input_parser.parseInput(input_text, "textarea", delimiter = self.delimiter_selected)
 		
 		if parsed_input:
 			self.screen.query_one(SearchRightPane).update_log("Parsed from Input:")
@@ -147,7 +158,7 @@ class SearchLeftPane(Widget):
 		input_parser = DBInputParser(log = self.screen.query_one(SearchRightPane).update_log)
 		input_text = self.screen.query_one(SearchMiddlePane).query_one("#input-batch", TextArea).text
 		
-		parsed_input = await input_parser.parseInput(input_text, "textarea")
+		parsed_input = await input_parser.parseInput(input_text, "textarea", delimiter = self.delimiter_selected)
 		
 		if parsed_input:
 			input_len = len(parsed_input)
@@ -176,7 +187,7 @@ class SearchMiddlePane(Widget):
 			yield Label()
 			with Container():
 				yield Markdown("## Text Input")
-				yield TextArea(placeholder = "AccessionNumber; ScientificName",
+				yield TextArea(placeholder = "AccessionNumber;ScientificName",
 							   id = "input-batch")
 
 class SearchRightPane(Widget):
@@ -221,7 +232,8 @@ class DBLeftPane(Widget):
 		with Vertical(id = "db-left-pane"):
 			with Container(id = "db-options-container"):
 				with Horizontal():
-					yield Select([("Taxonomy", "taxonomy"), ("Identifiers", "identifiers"), ("Traits", "traits")], value = "taxonomy")
+					yield Select(options = [("Taxonomy", "taxonomy"), ("Identifiers", "identifiers"), ("Traits", "traits")],
+								 value = "taxonomy", prompt = "Select a table...")
 					yield Input(id = "db-cell-input",
 								placeholder = "Select a cell...",
 								valid_empty = True,
@@ -229,10 +241,10 @@ class DBLeftPane(Widget):
 			with VerticalScroll(id = "db-table-container"):
 				yield DataTable(id = "db-table")
 	
-	def setDBTable(self, db_table: str):
+	def refreshDBTable(self):
 		db = DBInterface(log = self.screen.query_one(DBRightPane).update_log)
-		db_rows = db.readTable(db_table)
-		db_cols = [*DATABASE_SCHEMA[db_table]]
+		db_rows = db.readTable(self.current_table)
+		db_cols = [*DATABASE_SCHEMA[self.current_table]]
 		table = self.query_one(DataTable)
 		table.clear(columns = True)
 		table.add_columns(*db_cols)
@@ -241,7 +253,7 @@ class DBLeftPane(Widget):
 	@on(Select.Changed)
 	def select_changed(self, event: Select.Changed):
 		self.current_table = str(event.value)
-		self.setDBTable(self.current_table)
+		self.refreshDBTable()
 		# reset input field
 		self.query_one(Input).clear()
 		self.query_one(Input).disabled = True
@@ -312,6 +324,10 @@ class DatabaseScreen(Screen):
 					yield SearchPane()
 				with Container():
 					yield DBPane()
+	
+	@on(TabbedContent.TabActivated)
+	async def tab_activated(self) -> None:
+		self.query_one(DBPane).query_one(DBLeftPane).refreshDBTable()
 
 class DatabaseApp(App):
 	CSS_PATH = "tcss/textual_genotree.tcss"
