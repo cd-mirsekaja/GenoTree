@@ -10,3 +10,6 @@ dependencies:
         - beaupy
         - rich
         - pyyaml
+        - textual
+        - httpx
+        - pandas

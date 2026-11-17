@@ -91,7 +91,7 @@ class DBInterface():
 	def removeRow(self, primary_id):
 		pass
 	
-	def updateDB(self, input_data: pandas.DataFrame) -> None:
+	def updateDB(self, input_data: pd.DataFrame) -> None:
 		
 		data_keys = input_data.columns
 		
