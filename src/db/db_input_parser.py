@@ -6,7 +6,7 @@ import sys, os
 import pandas as pd
 from typing import Callable, Literal
 
-from src.db.db_utils import getInfo
+from db.db_utils import getInfo
 
 class DBInputParser():
 	"""

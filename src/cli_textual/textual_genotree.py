@@ -13,9 +13,8 @@ from .screen_lookup import LookupScreen
 from .screen_main import MainScreen
 from .screen_pipeline import PipelineScreen
 from .screen_database import DatabaseScreen
-from .screen_run import RunScreen
 
-from src.const import UI_THEME
+from const import UI_THEME
 
 class HelpScreen(ModalScreen):
 	DEFAULT_CSS = """

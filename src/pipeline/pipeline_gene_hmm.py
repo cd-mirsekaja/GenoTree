@@ -3,7 +3,7 @@ from typing import Callable
 
 import pyhmmer
 
-from src.types.alignment import Alignment
+from types.alignment import Alignment
 
 class GeneMM:
 	def __init__(self, alignment: Alignment,

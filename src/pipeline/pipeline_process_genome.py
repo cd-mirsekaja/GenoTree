@@ -3,8 +3,8 @@ from typing import Callable
 import pyhmmer
 import os
 
-from src.types.genome import Genome
-from src.types.gene import Alignment
+from types.genome import Genome
+from types.alignment import Alignment
 
 class ProcessGenome:
 	def __init__(self, genome: Genome, genes: list[Alignment], wdir: str | os.PathLike = os.getcwd(), log: Callable = print) -> None:

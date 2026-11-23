@@ -1,4 +1,4 @@
-from src.const import DATABASE_SCHEMA
+from const import DATABASE_SCHEMA
 
 class Taxon:
 	

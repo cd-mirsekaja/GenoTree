@@ -8,8 +8,8 @@ from textual.screen import Screen
 from textual.widget import Widget
 from textual.widgets import Input, Markdown, Footer, Header, RadioSet, RadioButton, Checkbox
 
-from src.db.db_utils import getInfo
-from src.const import UI_THEME
+from db.db_utils import getInfo
+from const import UI_THEME
 
 
 class Sidebar(Widget):

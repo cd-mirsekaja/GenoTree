@@ -3,7 +3,7 @@ from textual.screen import Screen
 from textual.containers import Container, Vertical, VerticalScroll
 from textual.widgets import Footer, Header, Markdown, Button
 
-from src.cli.cmd_docs import docstrings
+from cli.cmd_docs import docstrings
 
 class MainScreen(Screen):
 	CSS_PATH = "tcss/screen_main.tcss"

@@ -14,7 +14,7 @@ Configuration options are:
 import beaupy, os
 from rich.console import Console
 
-from src.utils.parse_configuration import ConfigParser
+from utils.parse_configuration import ConfigParser
 
 console = Console()
 
