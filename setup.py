@@ -18,7 +18,7 @@ setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "genotree=cli.entry:main",
+            "genotree=genotree.cli.entry:main",
         ],
     },
     classifiers=[
