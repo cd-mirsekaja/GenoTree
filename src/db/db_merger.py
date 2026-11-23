@@ -1,7 +1,7 @@
 import pandas as pd
 
-from src.const import FIELD_MAPPINGS
-from src.db.db_downloader import DBDownloader
+from const import FIELD_MAPPINGS
+from db.db_downloader import DBDownloader
 
 class DBMerger():
 	def __init__(self, scientific_name: str, platforms: list):

@@ -5,8 +5,8 @@ import pandas as pd
 import sqlite3
 from typing import Callable
 
-from src.db.db_input_parser import DBInputParser
-from src.const import DATABASE_SCHEMA, DB_PATH
+from db.db_input_parser import DBInputParser
+from const import DATABASE_SCHEMA, DB_PATH
 
 
 class DBInterface():
