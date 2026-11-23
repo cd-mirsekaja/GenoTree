@@ -1,17 +1,14 @@
 def getProjectRoot():
-	"""
-	Gets the project root directory, assuming this function is called
-	from a file within the project, and that there's a 'pyproject.toml'
-	file at the project root.
-	"""
+	import os
 	from pathlib import Path
-	# Start from THIS file's directory
-	current_file = Path(__file__).resolve()  # Using resolve to get an absolute path.
-	# Go up directories until we find 'pyproject.toml'
-	for parent in current_file.parents:  # Iterate over every parent.
-		if (parent / "src").exists():  # Checks if file exists
-			return parent
-	raise FileNotFoundError("Project root (with src) not found.")
+	d = Path(os.getcwd())
+	found = 0
+	while found == 0:
+		if os.path.isfile(os.path.join(d, ".root_file")):
+			found = 1
+		else:
+			d=d.parent
+	return d
 
 
 def getDatabasePath():
@@ -25,7 +22,7 @@ def getDatabasePath():
 	
 	return db_path
 
-PROJECT_VERSION = "2026.0.9"
+PROJECT_VERSION = "2026.0.10"
 UI_THEME = "rose-pine"
 
 ROOT_DIR = getProjectRoot()
