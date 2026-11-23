@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+dynamic = [
+    "version",
+    "dependencies"
+]
+name = "GenoTree"
+authors = [
+    {name = "Ronja Rösner", email = "ronja.roesner@uol.de"}
+]
+description = "Perform a detailed phylogenetic analysis on a combined dataset of genomes and genes"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+version = {attr = "const.PROJECT_VERSION"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = [
+    "test", "test.*",
+    "config", "config.*",
+    "data", "data.*",
+    "version_1", "version_1.*"
+]
+
+[project.scripts]
+genotree = "genotree.cli.entry:main"

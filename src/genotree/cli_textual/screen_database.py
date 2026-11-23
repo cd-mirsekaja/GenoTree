@@ -14,7 +14,7 @@ from textual.reactive import reactive
 
 from genotree.db.db_input_parser import DBInputParser
 from genotree.db.db_interface import DBInterface
-from genotree.const import ROOT_DIR, UI_THEME, DATABASE_SCHEMA
+from const import ROOT_DIR, UI_THEME, DATABASE_SCHEMA
 
 class DirValidator(Validator):
 	"""Test if input is an existing directory."""

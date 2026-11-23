@@ -9,7 +9,7 @@ from textual.widget import Widget
 from textual.widgets import Input, Markdown, Footer, Header, RadioSet, RadioButton, Checkbox
 
 from genotree.db.db_utils import getInfo
-from genotree.const import UI_THEME
+from const import UI_THEME
 
 
 class Sidebar(Widget):

@@ -11,7 +11,7 @@ from .screen_main import MainScreen
 from .screen_pipeline import PipelineScreen
 from .screen_database import DatabaseScreen
 
-from genotree.const import UI_THEME
+from const import UI_THEME
 
 class HelpScreen(ModalScreen):
 	DEFAULT_CSS = """

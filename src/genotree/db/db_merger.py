@@ -1,6 +1,6 @@
 import pandas as pd
 
-from genotree.const import FIELD_MAPPINGS
+from const import FIELD_MAPPINGS
 from genotree.db.db_downloader import DBDownloader
 
 class DBMerger():

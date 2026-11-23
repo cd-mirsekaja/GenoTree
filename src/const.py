@@ -25,7 +25,7 @@ def getDatabasePath():
 	
 	return db_path
 
-PROJECT_VERSION = "0.1.9"
+PROJECT_VERSION = "2026.0.9"
 UI_THEME = "rose-pine"
 
 ROOT_DIR = getProjectRoot()

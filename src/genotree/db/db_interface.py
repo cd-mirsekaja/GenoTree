@@ -6,7 +6,7 @@ import sqlite3
 from typing import Callable
 
 from genotree.db.db_input_parser import DBInputParser
-from genotree.const import DATABASE_SCHEMA, DB_PATH
+from const import DATABASE_SCHEMA, DB_PATH
 
 
 class DBInterface():
