@@ -4,10 +4,11 @@ from textual.containers import Container, Vertical, VerticalScroll
 from textual.widgets import Footer, Header, Markdown, Button
 
 
-class ConfigScreen(Screen):
-	CSS_PATH = "tcss/screen_config.tcss"
+class PipelineScreen(Screen):
+	CSS_PATH = "tcss/screen_pipeline.tcss"
 	
 	def compose(self) -> ComposeResult:
 		yield Header()
-		yield Markdown("# Configuration")
 		yield Footer()
+		
+		yield Markdown("# Pipeline")

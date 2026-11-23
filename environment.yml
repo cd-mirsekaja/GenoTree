@@ -13,3 +13,4 @@ dependencies:
         - textual
         - httpx
         - pandas
+        - pyhmmer

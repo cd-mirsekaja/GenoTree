@@ -11,7 +11,7 @@ from textual.widgets import Input, Markdown, Footer, Header, RadioSet, RadioButt
 
 from .screen_lookup import LookupScreen
 from .screen_main import MainScreen
-from .screen_config import ConfigScreen		
+from .screen_pipeline import PipelineScreen
 from .screen_database import DatabaseScreen
 from .screen_run import RunScreen
 
@@ -100,9 +100,8 @@ class GenoTree(App):
 
 	SCREENS = {
 		"main": MainScreen,
-		"config": ConfigScreen,
+		"pipeline": PipelineScreen,
 		"database": DatabaseScreen,
-		"run": RunScreen,
 		"lookup": LookupScreen
 	}
 
@@ -110,9 +109,8 @@ class GenoTree(App):
 		#Binding(key = "question_mark", action = "help", description = "Help", key_display = "?", priority = True),
 		#Binding(key = "ctrl+q", action = "request_quit", description = "Quit", priority = True),
 		Binding(key = "ctrl+y", action = "switch_screen('main')", description = "Home", priority = True),
-		Binding(key = "ctrl+f", action = "switch_screen('config')", description = "Config", priority = True),
 		Binding(key = "ctrl+d", action = "switch_screen('database')", description = "Database", priority = True),
-		Binding(key = "ctrl+r", action = "switch_screen('run')", description = "Pipeline", priority = True),
+		Binding(key = "ctrl+f", action = "switch_screen('pipeline')", description = "Pipeline", priority = True),
 		Binding(key = "ctrl+l", action = "switch_screen('lookup')", description = "Lookup", priority = True),
 		]
 
