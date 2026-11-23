@@ -1,6 +1,6 @@
 import os
 
-from src.utils.parse_configuration import ConfigParser
+from utils.parse_configuration import ConfigParser
 
 class EnvironmentParser:
 	"""
