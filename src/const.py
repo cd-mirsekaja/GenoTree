@@ -25,12 +25,11 @@ def getDatabasePath():
 	
 	return db_path
 
+PROJECT_VERSION = "0.1.9"
 UI_THEME = "rose-pine"
 
 ROOT_DIR = getProjectRoot()
 DB_PATH = getDatabasePath()
-
-PROJECT_VERSION = "0.1.8"
 
 DATABASE_SCHEMA = {
 	"taxonomy": {

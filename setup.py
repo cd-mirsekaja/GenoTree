@@ -12,14 +12,11 @@ setup(
     description = "Perform a detailed phylogenetic analysis on a combined dataset of genomes and genes",
     author = "Ronja Rösner",
     author_email = "ronja.roesner@uni-oldenburg.de",
-    packages = find_packages(where = "src", include = ['src', 'src.*']),
     package_dir = {"": "src"},
     include_package_data = True,
     install_requires = requirements,
     entry_points = {
-        "console_scripts": [
-            "genotree=cli.entry:main",
-        ],
+        "console_scripts": ["genotree=src.cli.entry:main"]
     },
     classifiers = [
         "Programming Language :: Python :: 3",
@@ -28,5 +25,3 @@ setup(
     ],
     python_requires = ">=3.10",
 )
-
-ROOT = os.path.dirname(os.path.abspath(__file__))
