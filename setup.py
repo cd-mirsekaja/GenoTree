@@ -1,7 +1,6 @@
 from setuptools import setup, find_packages
-import os
 
-from src.const import PROJECT_VERSION
+from src.genotree.const import PROJECT_VERSION
 
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
@@ -13,10 +12,11 @@ setup(
     author = "Ronja Rösner",
     author_email = "ronja.roesner@uni-oldenburg.de",
     package_dir = {"": "src"},
+    packages = find_packages(include = ['genotree', 'genotree.*', 'types', 'types.*']),
     include_package_data = True,
     install_requires = requirements,
     entry_points = {
-        "console_scripts": ["genotree=src.cli.entry:main"]
+        "console_scripts": ["genotree=genotree.cli.entry:main"]
     },
     classifiers = [
         "Programming Language :: Python :: 3",

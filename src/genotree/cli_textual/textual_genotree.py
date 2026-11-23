@@ -1,20 +1,17 @@
 from __future__ import annotations
 
-from textual import getters, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import VerticalScroll, Vertical, HorizontalScroll, Horizontal, Grid
-from textual.reactive import reactive
-from textual.screen import Screen, ModalScreen
-from textual.widget import Widget
-from textual.widgets import Input, Markdown, Footer, Header, RadioSet, RadioButton, Label, Static, Button
+from textual.containers import Grid
+from textual.screen import ModalScreen
+from textual.widgets import Label, Button
 
 from .screen_lookup import LookupScreen
 from .screen_main import MainScreen
 from .screen_pipeline import PipelineScreen
 from .screen_database import DatabaseScreen
 
-from const import UI_THEME
+from genotree.const import UI_THEME
 
 class HelpScreen(ModalScreen):
 	DEFAULT_CSS = """

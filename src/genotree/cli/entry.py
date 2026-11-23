@@ -24,7 +24,7 @@ from .cmd_docs import cli_docs
 from .cmd_lookup import cli_lookup
 from .cmd_run import cli_run
 
-from const import PROJECT_VERSION
+from genotree.const import PROJECT_VERSION
 
 ## set the main parser
 main_parser = argparse.ArgumentParser(

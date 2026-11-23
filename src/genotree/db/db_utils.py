@@ -6,7 +6,7 @@ import httpx
 from datetime import datetime
 from typing import Literal
 
-from db.db_merger import DBMerger
+from genotree.db.db_merger import DBMerger
 
 async def verifySpeciesName(scientific_name: str) -> str:
 	"""

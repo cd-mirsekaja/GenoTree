@@ -1,9 +1,9 @@
-from textual.app import App, ComposeResult
+from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.containers import Container, Vertical, VerticalScroll
-from textual.widgets import Footer, Header, Markdown, Button
+from textual.containers import Container, VerticalScroll
+from textual.widgets import Footer, Header, Markdown
 
-from cli.cmd_docs import docstrings
+from genotree.cli.cmd_docs import docstrings
 
 class MainScreen(Screen):
 	CSS_PATH = "tcss/screen_main.tcss"

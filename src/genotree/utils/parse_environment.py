@@ -1,6 +1,6 @@
 import os
 
-from utils.parse_configuration import ConfigParser
+from genotree.utils.parse_configuration import ConfigParser
 
 class EnvironmentParser:
 	"""

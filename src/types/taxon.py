@@ -1,5 +1,3 @@
-from const import DATABASE_SCHEMA
-
 class Taxon:
 	
 	

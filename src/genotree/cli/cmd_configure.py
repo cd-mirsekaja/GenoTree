@@ -14,7 +14,7 @@ Configuration options are:
 import beaupy, os
 from rich.console import Console
 
-from utils.parse_configuration import ConfigParser
+from genotree.utils.parse_configuration import ConfigParser
 
 console = Console()
 

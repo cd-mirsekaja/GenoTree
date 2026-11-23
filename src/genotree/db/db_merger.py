@@ -1,7 +1,7 @@
 import pandas as pd
 
-from const import FIELD_MAPPINGS
-from db.db_downloader import DBDownloader
+from genotree.const import FIELD_MAPPINGS
+from genotree.db.db_downloader import DBDownloader
 
 class DBMerger():
 	def __init__(self, scientific_name: str, platforms: list):

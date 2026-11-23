@@ -2,7 +2,7 @@
 genotree - open the interactive GUI for this tool.
 """
 
-from cli_textual.textual_genotree import GenoTree
+from genotree.cli_textual.textual_genotree import GenoTree
 
 def cli_genotree(args):
 	app = GenoTree()

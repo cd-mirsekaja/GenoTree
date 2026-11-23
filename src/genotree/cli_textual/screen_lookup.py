@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from textual import getters, work, events
+from textual import getters, work
 from textual.app import App, ComposeResult
 from textual.containers import VerticalScroll, Container
 from textual.reactive import reactive
@@ -8,8 +8,8 @@ from textual.screen import Screen
 from textual.widget import Widget
 from textual.widgets import Input, Markdown, Footer, Header, RadioSet, RadioButton, Checkbox
 
-from db.db_utils import getInfo
-from const import UI_THEME
+from genotree.db.db_utils import getInfo
+from genotree.const import UI_THEME
 
 
 class Sidebar(Widget):

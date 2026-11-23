@@ -2,7 +2,7 @@
 genotree db - manage the internal database for the pipeline
 
 """
-from cli_textual.screen_database import DatabaseApp
+from genotree.cli_textual.screen_database import DatabaseApp
 
 def cli_db(args):
 	app = DatabaseApp()

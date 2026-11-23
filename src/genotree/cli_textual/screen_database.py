@@ -8,13 +8,13 @@ from textual.screen import Screen
 from textual.containers import Container, Vertical, VerticalScroll, Horizontal
 from textual.widget import Widget
 from textual.widgets import Footer, Header, Markdown, Button, RichLog, Input, TextArea, TabbedContent, \
-	Checkbox, ProgressBar, DataTable, Label, DirectoryTree, TabPane, OptionList, Select
+	Checkbox, ProgressBar, DataTable, Label, DirectoryTree, Select
 from textual.validation import ValidationResult, Validator
 from textual.reactive import reactive
 
-from db.db_input_parser import DBInputParser
-from db.db_interface import DBInterface
-from const import ROOT_DIR, UI_THEME, DATABASE_SCHEMA
+from genotree.db.db_input_parser import DBInputParser
+from genotree.db.db_interface import DBInterface
+from genotree.const import ROOT_DIR, UI_THEME, DATABASE_SCHEMA
 
 class DirValidator(Validator):
 	"""Test if input is an existing directory."""
